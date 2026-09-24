@@ -586,7 +586,9 @@ document.addEventListener('DOMContentLoaded', () => {
        12.7. Backend Integration (Dynamic Fetching)
     ========================================= */
     async function fetchBackendData() {
-        const API_URL = 'http://localhost:5000/api';
+        const API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+            ? 'http://localhost:5000/api'
+            : 'https://portfolio-backend-51pc.onrender.com/api';
 
         try {
             // Fetch Profile
