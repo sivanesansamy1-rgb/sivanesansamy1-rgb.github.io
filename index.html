@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sivanesan S | Portfolio</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <!-- Custom Cursor -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loading-screen">
+        <div class="loader-content">
+            <h1 class="loader-initials">SS</h1>
+            <div class="loader-spinner"></div>
+        </div>
+    </div>
+
+    <!-- Background Elements -->
+    <div class="bg-gradient-1"></div>
+    <div class="bg-gradient-2"></div>
+
+    <!-- Navigation Bar -->
+    <header class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#" class="nav-logo">Sivanesan S</a>
+
+            <nav class="nav-menu" id="nav-menu">
+                <ul class="nav-links">
+                    <li><a href="#home" class="nav-link">Home</a></li>
+                    <li><a href="#about" class="nav-link">About</a></li>
+                    <li><a href="#skills" class="nav-link">Skills</a></li>
+                    <li><a href="#projects" class="nav-link">Projects</a></li>
+                    <li><a href="#experience" class="nav-link">Experience</a></li>
+                    <li><a href="#contact" class="nav-link">Contact</a></li>
+                </ul>
+            </nav>
+
+            <div class="nav-right">
+                <button class="theme-toggle" id="theme-toggle" aria-label="Toggle Dark/Light Mode">
+                    <i class="fa-solid fa-moon dark-icon"></i>
+                    <i class="fa-solid fa-sun light-icon"></i>
+                </button>
+                <a href="assets/resume.pdf" target="_blank" class="btn btn-outline resume-btn">Resume</a>
+
+
+                <div class="hamburger" id="hamburger">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="hero" id="home">
+            <div class="hero-container">
+                <!-- Left Side: Content -->
+                <div class="hero-content">
+                    <p class="greeting" style="font-size: 1.3rem;">Hello, I'm</p>
+                    <h1 class="main-heading">Sivanesan S</h1>
+                    <h2 class="typing-container">
+                        <span id="typing-text"></span><span class="typing-cursor">|</span>
+                    </h2>
+                    <p class="hero-intro">
+                        I am a passionate Computer Science Engineering student focused on building modern, responsive,
+                        and user-friendly web applications while continuously exploring Artificial Intelligence and
+                        emerging technologies.
+                    </p>
+
+                    <div class="hero-buttons">
+                        <a href="#projects" class="btn btn-primary">View My Work</a>
+                        <a href="assets/resume.pdf" download="Sivanesan_S_Resume.pdf" class="btn btn-secondary">Download Resume</a>
+                    </div>
+
+                    <div class="social-icons">
+                        <a href="https://github.com/sivanesansamy1-rgb" class="social-link" aria-label="GitHub"
+                            target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github"></i></a>
+                        <a href="https://www.linkedin.com/in/sivanesan--s" class="social-link"
+                            aria-label="LinkedIn" target="_blank" rel="noopener noreferrer"><i
+                                class="fa-brands fa-linkedin-in"></i></a>
+                        <a href="https://www.instagram.com/sivanesan_2k5?stkn=MTF2ZmVuMGF3d2tmcA==" class="social-link"
+                            aria-label="Instagram" target="_blank" rel="noopener noreferrer"><i
+                                class="fa-brands fa-instagram"></i></a>
+                        <a href="mailto:sivanesansamy1@gmail.com" class="social-link" aria-label="Email"><i
+                                class="fa-solid fa-envelope"></i></a>
+                    </div>
+                </div>
+
+                <!-- Right Side: Image and Floating Icons -->
+                <div class="hero-image-area">
+                    <div class="profile-frame">
+                        <div class="profile-glow"></div>
+                        <!-- We use a placeholder class if image is missing -->
+                        <div class="profile-image-container">
+                            <img src="assets/profile.jpg" alt="Sivanesan S" class="profile-img"
+                                onerror="this.style.display='none'; this.parentElement.classList.add('no-image');">
+                        </div>
+                    </div>
+
+                    <!-- Floating Tech Icons -->
+                    <div class="tech-icon floating-1"><i class="fa-brands fa-html5" style="color: #E34F26;"></i></div>
+                    <div class="tech-icon floating-2"><i class="fa-brands fa-css3-alt" style="color: #1572B6;"></i>
+                    </div>
+                    <div class="tech-icon floating-3"><i class="fa-brands fa-js" style="color: #F7DF1E;"></i></div>
+                    <div class="tech-icon floating-4"><i class="fa-brands fa-node-js" style="color: #339933;"></i></div>
+                    <div class="tech-icon floating-5"><i class="fa-solid fa-leaf" style="color: #47A248;"></i></div>
+                    <!-- MongoDB leaf -->
+                    <div class="tech-icon floating-6"><i class="fa-brands fa-python" style="color: #3776AB;"></i></div>
+                </div>
+            </div>
+
+            <!-- Scroll Indicator -->
+            <div class="scroll-indicator">
+                <div class="mouse">
+                    <div class="mouse-wheel"></div>
+                </div>
+                <span class="scroll-text">Scroll Down</span>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section class="section about" id="about">
+            <div class="container section-container">
+                <div class="section-header reveal">
+                    <h2 class="section-title">About Me</h2>
+                    <p class="section-subtitle">Get to know me better</p>
+                </div>
+
+                <div class="about-content">
+                    <!-- Left Side: Profile Card -->
+                    <div class="about-card reveal-left">
+                        <div class="about-card-inner">
+                            <div class="about-img-container">
+                                <img src="assets/profile.jpg" alt="Sivanesan S"
+                                    onerror="this.style.display='none'; this.parentElement.classList.add('no-image');">
+                            </div>
+                            <h3 class="about-name">Sivanesan S</h3>
+                            <p class="about-role">Full Stack Developer</p>
+                            <p class="about-location"><i class="fa-solid fa-location-dot"></i> Tamil Nadu, India</p>
+                        </div>
+                    </div>
+
+                    <!-- Right Side: Text & Stats -->
+                    <div class="about-text-area reveal-right">
+                        <p class="about-text">
+                            I am a final-year Computer Science and Engineering student with a strong interest in Full
+                            Stack Web Development and emerging technologies. I enjoy building responsive, user-friendly,
+                            and visually engaging web applications using modern web technologies.
+                        </p>
+                        <p class="about-text">
+                            My goal is to continuously improve my technical skills while exploring Artificial
+                            Intelligence, Generative AI, and cloud technologies. I enjoy learning new concepts, building
+                            practical projects, and transforming ideas into useful digital experiences.
+                        </p>
+
+                        <!-- Animated Statistics -->
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <h3 class="stat-number" data-target="5">0</h3>
+                                <p class="stat-label">Projects Completed</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3 class="stat-number" data-target="10">0</h3>
+                                <p class="stat-label">Technologies Learned</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3 class="stat-number" data-target="5">0</h3>
+                                <p class="stat-label">Certifications</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3 class="stat-number" data-target="2">0</h3>
+                                <p class="stat-label">Internships</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tech Stack Section -->
+        <section class="section tech-stack" id="tech-stack">
+            <div class="container section-container">
+                <div class="section-header reveal">
+                    <h2 class="section-title">My Tech Stack</h2>
+                    <p class="section-subtitle">Technologies I use to build modern applications.</p>
+                </div>
+
+                <div class="tech-grid">
+                    <div class="tech-card reveal-scale" style="transition-delay: 0.1s;">
+                        <i class="fa-brands fa-html5 tech-icon" style="color: #E34F26;"></i>
+                        <h4 class="tech-name">HTML5</h4>
+                    </div>
+                    <div class="tech-card reveal-scale" style="transition-delay: 0.2s;">
+                        <i class="fa-brands fa-css3-alt tech-icon" style="color: #1572B6;"></i>
+                        <h4 class="tech-name">CSS3</h4>
+                    </div>
+                    <div class="tech-card reveal-scale" style="transition-delay: 0.3s;">
+                        <i class="fa-brands fa-js tech-icon" style="color: #F7DF1E;"></i>
+                        <h4 class="tech-name">JavaScript</h4>
+                    </div>
+                    <div class="tech-card reveal-scale" style="transition-delay: 0.4s;">
+                        <i class="fa-brands fa-node-js tech-icon" style="color: #339933;"></i>
+                        <h4 class="tech-name">Node.js</h4>
+                    </div>
+                    <div class="tech-card reveal-scale" style="transition-delay: 0.5s;">
+                        <i class="fa-brands fa-node tech-icon" style="color: #8CC84B;"></i>
+                        <!-- Express substitute icon -->
+                        <h4 class="tech-name">Express.js</h4>
+                    </div>
+                    <div class="tech-card reveal-scale" style="transition-delay: 0.6s;">
+                        <i class="fa-solid fa-leaf tech-icon" style="color: #47A248;"></i>
+                        <h4 class="tech-name">MongoDB</h4>
+                    </div>
+                    <div class="tech-card reveal-scale" style="transition-delay: 0.7s;">
+                        <i class="fa-brands fa-python tech-icon" style="color: #3776AB;"></i>
+                        <h4 class="tech-name">Python</h4>
+                    </div>
+                    <div class="tech-card reveal-scale" style="transition-delay: 0.9s;">
+                        <i class="fa-brands fa-github tech-icon"></i>
+                        <h4 class="tech-name">GitHub</h4>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills Section -->
+        <section class="section skills" id="skills">
+            <div class="container section-container">
+                <div class="section-header reveal">
+                    <h2 class="section-title">My Skills</h2>
+                    <p class="section-subtitle">Technologies and skills I am continuously improving.</p>
+                </div>
+
+                <div class="skills-content">
+                    <!-- Progress Bars Section -->
+                    <div class="skills-linear-group reveal-left">
+                        <div class="skill-category">
+                            <h3 class="skill-category-title">Frontend Development</h3>
+                            <div class="skill-item">
+                                <div class="skill-info">
+                                    <span class="skill-name">HTML5</span>
+                                    <span class="skill-percentage">90%</span>
+                                </div>
+                                <div class="skill-bar-bg">
+                                    <div class="skill-bar-fill" data-width="90%"></div>
+                                </div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="skill-info">
+                                    <span class="skill-name">CSS3</span>
+                                    <span class="skill-percentage">85%</span>
+                                </div>
+                                <div class="skill-bar-bg">
+                                    <div class="skill-bar-fill" data-width="85%"></div>
+                                </div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="skill-info">
+                                    <span class="skill-name">JavaScript</span>
+                                    <span class="skill-percentage">80%</span>
+                                </div>
+                                <div class="skill-bar-bg">
+                                    <div class="skill-bar-fill" data-width="80%"></div>
+                                </div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="skill-info">
+                                    <span class="skill-name">Responsive Design</span>
+                                    <span class="skill-percentage">85%</span>
+                                </div>
+                                <div class="skill-bar-bg">
+                                    <div class="skill-bar-fill" data-width="85%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="skill-category">
+                            <h3 class="skill-category-title">Backend Development</h3>
+                            <div class="skill-item">
+                                <div class="skill-info">
+                                    <span class="skill-name">Node.js</span>
+                                    <span class="skill-percentage">75%</span>
+                                </div>
+                                <div class="skill-bar-bg">
+                                    <div class="skill-bar-fill" data-width="75%"></div>
+                                </div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="skill-info">
+                                    <span class="skill-name">Express.js</span>
+                                    <span class="skill-percentage">70%</span>
+                                </div>
+                                <div class="skill-bar-bg">
+                                    <div class="skill-bar-fill" data-width="70%"></div>
+                                </div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="skill-info">
+                                    <span class="skill-name">REST APIs</span>
+                                    <span class="skill-percentage">70%</span>
+                                </div>
+                                <div class="skill-bar-bg">
+                                    <div class="skill-bar-fill" data-width="70%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="skill-category">
+                            <h3 class="skill-category-title">Database</h3>
+                            <div class="skill-item">
+                                <div class="skill-info">
+                                    <span class="skill-name">MongoDB</span>
+                                    <span class="skill-percentage">75%</span>
+                                </div>
+                                <div class="skill-bar-bg">
+                                    <div class="skill-bar-fill" data-width="75%"></div>
+                                </div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="skill-info">
+                                    <span class="skill-name">Database Fundamentals</span>
+                                    <span class="skill-percentage">75%</span>
+                                </div>
+                                <div class="skill-bar-bg">
+                                    <div class="skill-bar-fill" data-width="75%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="skill-category">
+                            <h3 class="skill-category-title">Tools</h3>
+                            <div class="skill-item">
+                                <div class="skill-info">
+                                    <span class="skill-name">GitHub</span>
+                                    <span class="skill-percentage">80%</span>
+                                </div>
+                                <div class="skill-bar-bg">
+                                    <div class="skill-bar-fill" data-width="80%"></div>
+                                </div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="skill-info">
+                                    <span class="skill-name">VS Code</span>
+                                    <span class="skill-percentage">85%</span>
+                                </div>
+                                <div class="skill-bar-bg">
+                                    <div class="skill-bar-fill" data-width="85%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="skill-category">
+                            <h3 class="skill-category-title">Additional Skills</h3>
+                            <div class="skill-item">
+                                <div class="skill-info">
+                                    <span class="skill-name">Python</span>
+                                    <span class="skill-percentage">70%</span>
+                                </div>
+                                <div class="skill-bar-bg">
+                                    <div class="skill-bar-fill" data-width="70%"></div>
+                                </div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="skill-info">
+                                    <span class="skill-name">AI Fundamentals</span>
+                                    <span class="skill-percentage">65%</span>
+                                </div>
+                                <div class="skill-bar-bg">
+                                    <div class="skill-bar-fill" data-width="65%"></div>
+                                </div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="skill-info">
+                                    <span class="skill-name">Google Cloud Fundamentals</span>
+                                    <span class="skill-percentage">60%</span>
+                                </div>
+                                <div class="skill-bar-bg">
+                                    <div class="skill-bar-fill" data-width="60%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Circular Indicators Section -->
+                    <div class="skills-circular-group reveal-right">
+                        <div class="circular-grid">
+                            <div class="circular-item">
+                                <div class="circular-progress" data-percent="90">
+                                    <svg viewBox="0 0 100 100">
+                                        <circle class="circle-bg" cx="50" cy="50" r="40"></circle>
+                                        <circle class="circle-fill" cx="50" cy="50" r="40" stroke-dasharray="251.2"
+                                            stroke-dashoffset="251.2"></circle>
+                                    </svg>
+                                    <div class="circular-inner">
+                                        <i class="fa-brands fa-html5 circular-icon" style="color: #E34F26;"></i>
+                                        <span class="circular-percent">90%</span>
+                                    </div>
+                                </div>
+                                <p class="circular-title">HTML</p>
+                            </div>
+                            <div class="circular-item">
+                                <div class="circular-progress" data-percent="85">
+                                    <svg viewBox="0 0 100 100">
+                                        <circle class="circle-bg" cx="50" cy="50" r="40"></circle>
+                                        <circle class="circle-fill" cx="50" cy="50" r="40" stroke-dasharray="251.2"
+                                            stroke-dashoffset="251.2"></circle>
+                                    </svg>
+                                    <div class="circular-inner">
+                                        <i class="fa-brands fa-css3-alt circular-icon" style="color: #1572B6;"></i>
+                                        <span class="circular-percent">85%</span>
+                                    </div>
+                                </div>
+                                <p class="circular-title">CSS</p>
+                            </div>
+                            <div class="circular-item">
+                                <div class="circular-progress" data-percent="80">
+                                    <svg viewBox="0 0 100 100">
+                                        <circle class="circle-bg" cx="50" cy="50" r="40"></circle>
+                                        <circle class="circle-fill" cx="50" cy="50" r="40" stroke-dasharray="251.2"
+                                            stroke-dashoffset="251.2"></circle>
+                                    </svg>
+                                    <div class="circular-inner">
+                                        <i class="fa-brands fa-js circular-icon" style="color: #F7DF1E;"></i>
+                                        <span class="circular-percent">80%</span>
+                                    </div>
+                                </div>
+                                <p class="circular-title">JavaScript</p>
+                            </div>
+                            <div class="circular-item">
+                                <div class="circular-progress" data-percent="75">
+                                    <svg viewBox="0 0 100 100">
+                                        <circle class="circle-bg" cx="50" cy="50" r="40"></circle>
+                                        <circle class="circle-fill" cx="50" cy="50" r="40" stroke-dasharray="251.2"
+                                            stroke-dashoffset="251.2"></circle>
+                                    </svg>
+                                    <div class="circular-inner">
+                                        <i class="fa-brands fa-node-js circular-icon" style="color: #339933;"></i>
+                                        <span class="circular-percent">75%</span>
+                                    </div>
+                                </div>
+                                <p class="circular-title">Node.js</p>
+                            </div>
+                            <div class="circular-item">
+                                <div class="circular-progress" data-percent="75">
+                                    <svg viewBox="0 0 100 100">
+                                        <circle class="circle-bg" cx="50" cy="50" r="40"></circle>
+                                        <circle class="circle-fill" cx="50" cy="50" r="40" stroke-dasharray="251.2"
+                                            stroke-dashoffset="251.2"></circle>
+                                    </svg>
+                                    <div class="circular-inner">
+                                        <i class="fa-solid fa-leaf circular-icon" style="color: #47A248;"></i>
+                                        <span class="circular-percent">75%</span>
+                                    </div>
+                                </div>
+                                <p class="circular-title">MongoDB</p>
+                            </div>
+                            <div class="circular-item">
+                                <div class="circular-progress" data-percent="70">
+                                    <svg viewBox="0 0 100 100">
+                                        <circle class="circle-bg" cx="50" cy="50" r="40"></circle>
+                                        <circle class="circle-fill" cx="50" cy="50" r="40" stroke-dasharray="251.2"
+                                            stroke-dashoffset="251.2"></circle>
+                                    </svg>
+                                    <div class="circular-inner">
+                                        <i class="fa-brands fa-python circular-icon" style="color: #3776AB;"></i>
+                                        <span class="circular-percent">70%</span>
+                                    </div>
+                                </div>
+                                <p class="circular-title">Python</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section class="section projects" id="projects">
+            <div class="container section-container">
+                <div class="section-header reveal">
+                    <h2 class="section-title">Featured Projects</h2>
+                    <p class="section-subtitle">A selection of projects that showcase my skills and development journey.
+                    </p>
+                </div>
+
+                <!-- Filters -->
+                <div class="project-filters reveal">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="web-development">Web Development</button>
+                    <button class="filter-btn" data-filter="ai-ml">AI / ML</button>
+                    <button class="filter-btn" data-filter="machine-learning">Machine Learning</button>
+                </div>
+
+                <!-- Counter -->
+                <div class="project-counter reveal">
+                    <p id="projects-counter">Showing 0 Projects</p>
+                </div>
+
+                <!-- Projects Container -->
+                <div class="projects-grid reveal-scale" id="projects-container">
+                    <!-- Projects injected via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Project Details Modal -->
+        <div class="modal-overlay" id="project-modal">
+            <div class="modal-content">
+                <button class="modal-close" id="modal-close" aria-label="Close modal"><i
+                        class="fa-solid fa-times"></i></button>
+                <div class="modal-body">
+                    <div class="modal-image-container">
+                        <img id="modal-img" src="" alt="Project Image"
+                            onerror="this.style.display='none'; this.parentElement.classList.add('no-image');">
+                    </div>
+                    <div class="modal-details">
+                        <span class="modal-category" id="modal-category">Category</span>
+                        <h3 class="modal-title" id="modal-title">Project Title</h3>
+                        <p class="modal-description" id="modal-description">Project description goes here.</p>
+
+                        <h4 class="modal-tech-title">Technologies Used:</h4>
+                        <div class="modal-tech-tags" id="modal-tags">
+                            <!-- Tags injected via JS -->
+                        </div>
+
+                        <div class="modal-buttons">
+                            <a href="#" class="btn btn-primary" id="modal-live-btn" target="_blank"
+                                rel="noopener noreferrer">Live Demo <i class="fa-solid fa-external-link-alt"></i></a>
+                            <a href="#" class="btn btn-outline" id="modal-github-btn" target="_blank"
+                                rel="noopener noreferrer">GitHub <i class="fa-brands fa-github"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Experience Section -->
+        <section class="section experience" id="experience">
+            <div class="container section-container">
+                <div class="section-header reveal">
+                    <h2 class="section-title">Experience</h2>
+                    <p class="section-subtitle">My professional journey and internships.</p>
+                </div>
+
+                <div class="timeline">
+                    <div class="timeline-item reveal-left">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-date">May 2026 – June 2026</div>
+                            <h3 class="timeline-title">Student Summer Internship (SSI 2026)</h3>
+                            <h4 class="timeline-org">SSN College <span class="timeline-mode">(Online)</span></h4>
+                            <p class="timeline-desc">Successfully completed the Student Summer Internship program and
+                                gained valuable exposure to technical learning and practical development.</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item reveal-right">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-date">2026</div>
+                            <h3 class="timeline-title">Internship</h3>
+                            <h4 class="timeline-org">Murugan Solutions</h4>
+                            <p class="timeline-desc">Completed a one-month internship and gained practical experience in
+                                web development and professional software development workflows.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Education Section -->
+        <section class="section education" id="education">
+            <div class="container section-container">
+                <div class="section-header reveal">
+                    <h2 class="section-title">Education</h2>
+                    <p class="section-subtitle">My academic background.</p>
+                </div>
+
+                <div id="education-container">
+                    <div class="education-card reveal-scale">
+                        <div class="edu-icon-wrapper">
+                            <i class="fa-solid fa-graduation-cap edu-icon"></i>
+                        </div>
+                        <div class="edu-details">
+                            <h3 class="edu-degree">Bachelor of Engineering</h3>
+                            <h4 class="edu-major">Computer Science and Engineering</h4>
+                            <p class="edu-university">Anna University Regional Campus Madurai</p>
+                            <div class="edu-meta">
+                                <span class="edu-status"><i class="fa-solid fa-user-graduate"></i> Final Year Student</span>
+                                <span class="edu-year"><i class="fa-regular fa-calendar-check"></i> Expected [Graduation Year]</span>
+                            </div>
+                            <p class="edu-coursework"><strong>Relevant Coursework:</strong> Data Structures, Algorithms,
+                                Database Management Systems, Web Technology, Artificial Intelligence.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Certifications Section -->
+        <section class="section certifications" id="certifications">
+            <div class="container section-container">
+                <div class="section-header reveal">
+                    <h2 class="section-title">Certifications</h2>
+                    <p class="section-subtitle">Professional certifications and courses I have completed.</p>
+                </div>
+
+                <div class="cert-grid reveal-scale" id="cert-container">
+                    <!-- Certifications injected via JS -->
+                </div>
+            </div>
+        </section>
+        <!-- Contact Section -->
+        <section class="section contact" id="contact">
+            <div class="container section-container">
+                <div class="section-header reveal">
+                    <h2 class="section-title">Let's Work Together</h2>
+                    <p class="section-subtitle">Feel free to reach out for collaboration, opportunities, or discussions.
+                    </p>
+                </div>
+
+                <div class="contact-content">
+                    <div class="contact-info reveal-left">
+                        <a href="mailto:sivanesansamy1@gmail.com" class="contact-card">
+                            <i class="fa-solid fa-envelope contact-icon"></i>
+                            <div class="contact-card-info">
+                                <h3>Email</h3>
+                                <p>sivanesansamy1@gmail.com</p>
+                            </div>
+                        </a>
+                        <div class="contact-card">
+                            <i class="fa-solid fa-location-dot contact-icon"></i>
+                            <div class="contact-card-info">
+                                <h3>Location</h3>
+                                <p>Nagapattinam, India</p>
+                            </div>
+                        </div>
+                        <a href="https://www.linkedin.com/in/sivanesan--s" class="contact-card" target="_blank"
+                            rel="noopener noreferrer">
+                            <i class="fa-brands fa-linkedin contact-icon"></i>
+                            <div class="contact-card-info">
+                                <h3>LinkedIn</h3>
+                                <p>sivanesan-s-29s0825</p>
+                            </div>
+                        </a>
+                        <a href="https://github.com/sivanesansamy1-rgb" class="contact-card" target="_blank"
+                            rel="noopener noreferrer">
+                            <i class="fa-brands fa-github contact-icon"></i>
+                            <div class="contact-card-info">
+                                <h3>GitHub</h3>
+                                <p>sivanesansamy1-rgb</p>
+                            </div>
+                        </a>
+                        <a href="https://www.instagram.com/sivanesan_2k5?stkn=MTF2ZmVuMGF3d2tmcA==" class="contact-card"
+                            target="_blank" rel="noopener noreferrer">
+                            <i class="fa-brands fa-instagram contact-icon"></i>
+                            <div class="contact-card-info">
+                                <h3>Instagram</h3>
+                                <p>sivanesan_2k5</p>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="contact-form-container reveal-right">
+                        <form id="contactForm" class="contact-form" novalidate>
+                            <div class="form-group">
+                                <label for="name">Name</label>
+                                <input type="text" id="name" name="name" placeholder="Your Name" required>
+                                <span class="error-msg" id="nameError">Name cannot be empty</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" name="email" placeholder="Your Email" required>
+                                <span class="error-msg" id="emailError">Please enter a valid email address</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="subject">Subject</label>
+                                <input type="text" id="subject" name="subject" placeholder="Subject" required>
+                                <span class="error-msg" id="subjectError">Subject cannot be empty</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="message">Message</label>
+                                <textarea id="message" name="message" rows="5" placeholder="Your Message"
+                                    required></textarea>
+                                <span class="error-msg" id="messageError">Message cannot be empty</span>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-submit">
+                                <span>Send Message</span>
+                                <i class="fa-regular fa-paper-plane"></i>
+                            </button>
+
+                            <div class="form-success" id="formSuccess">
+                                <i class="fa-solid fa-circle-check"></i> Message sent successfully! I will get back to
+                                you soon.
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-glow"></div>
+        <div class="container footer-container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="#home" class="footer-logo">Sivanesan S</a>
+                    <p class="footer-text">Building innovative ideas into stunning digital experiences. Let's create
+                        something amazing together.</p>
+                </div>
+
+                <div class="footer-links">
+                    <h3 class="footer-title">Quick Links</h3>
+                    <ul>
+                        <li><a href="#about"><i class="fa-solid fa-chevron-right"></i> About</a></li>
+                        <li><a href="#projects"><i class="fa-solid fa-chevron-right"></i> Projects</a></li>
+                        <li><a href="#skills"><i class="fa-solid fa-chevron-right"></i> Skills</a></li>
+                        <li><a href="#experience"><i class="fa-solid fa-chevron-right"></i> Experience</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-social-wrapper">
+                    <h3 class="footer-title">Connect</h3>
+                    <div class="footer-socials">
+                        <a href="https://github.com/sivanesansamy1-rgb" aria-label="GitHub" target="_blank"
+                            rel="noopener noreferrer"><i class="fa-brands fa-github"></i></a>
+                        <a href="https://www.linkedin.com/in/sivanesan--s" aria-label="LinkedIn" target="_blank"
+                            rel="noopener noreferrer"><i class="fa-brands fa-linkedin-in"></i></a>
+                        <a href="mailto:sivanesansamy1@gmail.com" aria-label="Email"><i
+                                class="fa-solid fa-envelope"></i></a>
+                        <a href="https://www.instagram.com/sivanesan_2k5?stkn=MTF2ZmVuMGF3d2tmcA=="
+                            aria-label="Instagram" target="_blank" rel="noopener noreferrer"><i
+                                class="fa-brands fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 Sivanesan S. All Rights Reserved.</p>
+                <div class="footer-bottom-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTopBtn" aria-label="Back to top">
+        <i class="fa-solid fa-arrow-up"></i>
+    </button>
+
+    <!-- Custom JavaScript -->
+    <script src="js/script.js"></script>
+</body>
+
+</html>

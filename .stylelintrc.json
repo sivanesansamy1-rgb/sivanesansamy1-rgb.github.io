@@ -1,0 +1,11 @@
+{
+  "extends": ["stylelint-config-standard"],
+  "rules": {
+    "declaration-block-single-line-max-declarations": null,
+    "no-descending-specificity": null,
+    "no-duplicate-selectors": null,
+    "font-family-no-missing-generic-family-keyword": null,
+    "keyframes-name-pattern": null,
+    "declaration-property-value-no-unknown": null
+  }
+}

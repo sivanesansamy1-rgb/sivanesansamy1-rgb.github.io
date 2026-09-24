@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Admin Dashboard</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css"> <!-- Import base theme variables -->
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen" class="login-container">
+        <button class="theme-toggle" id="theme-toggle-login" aria-label="Toggle Dark/Light Mode" style="position: absolute; top: 20px; right: 20px;">
+            <i class="fa-solid fa-moon dark-icon"></i>
+            <i class="fa-solid fa-sun light-icon"></i>
+        </button>
+        <div class="login-card">
+            <h2>Admin Access</h2>
+            <p>Please log in to manage your portfolio.</p>
+            <form id="loginForm" autocomplete="off">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required autocomplete="new-password">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="password-wrapper" style="position: relative;">
+                        <input type="password" id="password" required style="width: 100%; padding-right: 40px;" autocomplete="new-password">
+                        <i class="fa-solid fa-eye" id="togglePassword" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-secondary);"></i>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top: 15px;">Login</button>
+                <div id="loginError" class="error-msg"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- DASHBOARD SCREEN -->
+    <div id="dashboard-screen" class="dashboard-container" style="display: none;">
+        
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3>Admin Panel</h3>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-target="dashboard">
+                    <i class="fa-solid fa-chart-pie"></i> Dashboard
+                </a>
+                <a href="#" class="nav-item" data-target="profile">
+                    <i class="fa-solid fa-user"></i> Profile
+                </a>
+                <a href="#" class="nav-item" data-target="projects">
+                    <i class="fa-solid fa-briefcase"></i> Projects
+                </a>
+                <a href="#" class="nav-item" data-target="skills">
+                    <i class="fa-solid fa-code"></i> Skills
+                </a>
+                <a href="#" class="nav-item" data-target="experience">
+                    <i class="fa-solid fa-timeline"></i> Experience
+                </a>
+                <a href="#" class="nav-item" data-target="education">
+                    <i class="fa-solid fa-graduation-cap"></i> Education
+                </a>
+                <a href="#" class="nav-item" data-target="certifications">
+                    <i class="fa-solid fa-certificate"></i> Certifications
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="index.html" class="nav-item">
+                    <i class="fa-solid fa-arrow-left"></i> Back to Site
+                </a>
+                <a href="#" class="nav-item" id="logoutBtn">
+                    <i class="fa-solid fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-header" style="justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="mobile-menu-btn" class="mobile-menu-btn">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <h2 style="margin: 0;">Portfolio Management System</h2>
+                </div>
+                <button class="theme-toggle" id="theme-toggle-admin" aria-label="Toggle Dark/Light Mode">
+                    <i class="fa-solid fa-moon dark-icon"></i>
+                    <i class="fa-solid fa-sun light-icon"></i>
+                </button>
+            </header>
+
+            <div class="content-area">
+                
+                <!-- Dashboard View -->
+                <section id="view-dashboard" class="admin-view active-view">
+                    <h3>Overview</h3>
+                    <p>Welcome to your admin panel. Select a section from the sidebar to edit your portfolio content.</p>
+                    <div class="stats-cards">
+                        <div class="stat-card">
+                            <i class="fa-solid fa-briefcase"></i>
+                            <div>
+                                <h4>Projects</h4>
+                                <p id="stat-projects">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fa-solid fa-code"></i>
+                            <div>
+                                <h4>Skills</h4>
+                                <p id="stat-skills">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Profile View -->
+                <section id="view-profile" class="admin-view">
+                    <h3>Edit Profile</h3>
+                    <form id="profileForm" class="admin-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Name</label>
+                                <input type="text" id="prof-name">
+                            </div>
+                            <div class="form-group">
+                                <label>Role(s) (comma separated)</label>
+                                <input type="text" id="prof-role" placeholder="e.g. Full Stack Developer, Web Developer">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>About Text</label>
+                            <textarea id="prof-about" rows="4"></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" id="prof-email">
+                            </div>
+                            <div class="form-group">
+                                <label>Location</label>
+                                <input type="text" id="prof-location">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>LinkedIn URL</label>
+                                <input type="text" id="prof-linkedin">
+                            </div>
+                            <div class="form-group">
+                                <label>GitHub URL</label>
+                                <input type="text" id="prof-github">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Profile</button>
+                        <span id="profileMsg" class="success-msg"></span>
+                    </form>
+
+                    <hr style="margin: 2rem 0; border-color: var(--border-color);">
+                    
+                    <h3>Upload Resume</h3>
+                    <form id="resumeUploadForm" class="admin-form">
+                        <div class="form-group">
+                            <label>Select PDF Resume</label>
+                            <input type="file" id="resume-file" accept="application/pdf" required style="padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; width: 100%; color: var(--text-primary); background: var(--bg-surface);">
+                        </div>
+                        <button type="submit" class="btn btn-secondary">Upload Resume</button>
+                        <span id="resumeMsg" class="success-msg"></span>
+                    </form>
+                </section>
+
+                <!-- Projects View -->
+                <section id="view-projects" class="admin-view">
+                    <div class="view-header">
+                        <h3>Manage Projects</h3>
+                        <button class="btn btn-primary" onclick="openModal('projectModal')">Add New Project</button>
+                    </div>
+                    <div class="table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Category</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="projectsTableBody">
+                                <!-- JS injected -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Skills View -->
+                <section id="view-skills" class="admin-view">
+                    <div class="view-header">
+                        <h3>Manage Skills</h3>
+                        <button class="btn btn-primary" onclick="openModal('skillModal')">Add New Skill</button>
+                    </div>
+                    <div class="table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Category</th>
+                                    <th>Percentage</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="skillsTableBody">
+                                <!-- JS injected -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Experience View -->
+                <section id="view-experience" class="admin-view">
+                    <div class="view-header">
+                        <h3>Manage Experience</h3>
+                        <button class="btn btn-primary" onclick="openModal('experienceModal')">Add New Experience</button>
+                    </div>
+                    <div class="table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Organization</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="experienceTableBody">
+                                <!-- JS injected -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Education View -->
+                <section id="view-education" class="admin-view">
+                    <div class="view-header">
+                        <h3>Manage Education</h3>
+                        <button class="btn btn-primary" onclick="openModal('educationModal')">Add New Education</button>
+                    </div>
+                    <div class="table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Degree</th>
+                                    <th>University</th>
+                                    <th>Year</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="educationTableBody">
+                                <!-- JS injected -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Certifications View -->
+                <section id="view-certifications" class="admin-view">
+                    <div class="view-header">
+                        <h3>Manage Certifications</h3>
+                        <button class="btn btn-primary" onclick="openModal('certificationModal')">Add New Certification</button>
+                    </div>
+                    <div class="table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Organization</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="certificationsTableBody">
+                                <!-- JS injected -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Project Modal -->
+    <div id="projectModal" class="admin-modal">
+        <div class="admin-modal-content">
+            <span class="close-modal" onclick="closeModal('projectModal')">&times;</span>
+            <h2>Add / Edit Project</h2>
+            <form id="projectForm">
+                <input type="hidden" id="proj-id">
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" id="proj-title" required>
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <input type="text" id="proj-category" required>
+                </div>
+                <div class="form-group">
+                    <label>Project Image (Optional)</label>
+                    <input type="file" id="proj-image" accept="image/*" style="padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; width: 100%; color: var(--text-primary); background: var(--bg-surface);">
+                    <div style="margin-top: 10px;">
+                        <img id="proj-image-preview" src="" alt="Image Preview" style="display: none; max-width: 100%; max-height: 200px; border-radius: 8px; border: 1px solid var(--border-color);">
+                        <p id="proj-image-name" style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 5px;"></p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Filter ID (e.g. web-development)</label>
+                    <input type="text" id="proj-filter" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="proj-desc" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Technologies (comma separated)</label>
+                    <input type="text" id="proj-tech" required>
+                </div>
+                <div class="form-group">
+                    <label>Live Link (optional)</label>
+                    <input type="text" id="proj-livelink">
+                </div>
+                <div class="form-group">
+                    <label>GitHub Link (optional)</label>
+                    <input type="text" id="proj-githublink">
+                </div>
+                <button type="submit" class="btn btn-primary">Save Project</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Skill Modal -->
+    <div id="skillModal" class="admin-modal">
+        <div class="admin-modal-content">
+            <span class="close-modal" onclick="closeModal('skillModal')">&times;</span>
+            <h2>Add / Edit Skill</h2>
+            <form id="skillForm">
+                <input type="hidden" id="skill-id">
+                <div class="form-group">
+                    <label>Skill Name</label>
+                    <input type="text" id="skill-name" required>
+                </div>
+                <div class="form-group">
+                    <label>Category (e.g. Frontend Development)</label>
+                    <input type="text" id="skill-category" required>
+                </div>
+                <div class="form-group">
+                    <label>Percentage (0-100)</label>
+                    <input type="number" id="skill-percentage" min="0" max="100" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Save Skill</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Experience Modal -->
+    <div id="experienceModal" class="admin-modal">
+        <div class="admin-modal-content">
+            <span class="close-modal" onclick="closeModal('experienceModal')">&times;</span>
+            <h2>Add / Edit Experience</h2>
+            <form id="experienceForm">
+                <input type="hidden" id="exp-id">
+                <div class="form-group">
+                    <label>Job/Role Title</label>
+                    <input type="text" id="exp-title" required>
+                </div>
+                <div class="form-group">
+                    <label>Organization</label>
+                    <input type="text" id="exp-org" required>
+                </div>
+                <div class="form-group">
+                    <label>Date (e.g. May 2026 – June 2026)</label>
+                    <input type="text" id="exp-date" required>
+                </div>
+                <div class="form-group">
+                    <label>Mode (e.g. Online, Full-time)</label>
+                    <input type="text" id="exp-mode">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="exp-desc" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Save Experience</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Education Modal -->
+    <div id="educationModal" class="admin-modal">
+        <div class="admin-modal-content">
+            <span class="close-modal" onclick="closeModal('educationModal')">&times;</span>
+            <h2>Add / Edit Education</h2>
+            <form id="educationForm">
+                <input type="hidden" id="edu-id">
+                <div class="form-group">
+                    <label>Degree</label>
+                    <input type="text" id="edu-degree" required>
+                </div>
+                <div class="form-group">
+                    <label>Major</label>
+                    <input type="text" id="edu-major" required>
+                </div>
+                <div class="form-group">
+                    <label>University / Institution</label>
+                    <input type="text" id="edu-university" required>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <input type="text" id="edu-status">
+                </div>
+                <div class="form-group">
+                    <label>Year</label>
+                    <input type="text" id="edu-year">
+                </div>
+                <div class="form-group">
+                    <label>Relevant Coursework (optional)</label>
+                    <textarea id="edu-coursework"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Save Education</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Certification Modal -->
+    <div id="certificationModal" class="admin-modal">
+        <div class="admin-modal-content">
+            <span class="close-modal" onclick="closeModal('certificationModal')">&times;</span>
+            <h2>Add / Edit Certification</h2>
+            <form id="certificationForm">
+                <input type="hidden" id="cert-id">
+                <div class="form-group">
+                    <label>Certification Title</label>
+                    <input type="text" id="cert-title" required>
+                </div>
+                <div class="form-group">
+                    <label>Organization</label>
+                    <input type="text" id="cert-org" required>
+                </div>
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="text" id="cert-date" required>
+                </div>
+                <div class="form-group">
+                    <label>Icon Class (e.g. fa-google)</label>
+                    <input type="text" id="cert-icon" value="fa-certificate">
+                </div>
+                <div class="form-group">
+                    <label>Link</label>
+                    <input type="text" id="cert-link" value="#">
+                </div>
+                <button type="submit" class="btn btn-primary">Save Certification</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="admin-modal">
+        <div class="admin-modal-content" style="text-align: center; padding: 2.5rem 2rem;">
+            <i class="fa-solid fa-circle-exclamation" style="font-size: 3.5rem; color: #ff4757; margin-bottom: 1.5rem;"></i>
+            <h2 style="margin-bottom: 1rem; color: #fff;">Are you sure?</h2>
+            <p id="deleteModalMessage" style="color: var(--text-secondary); margin-bottom: 2rem;">Do you really want to delete this item? This action cannot be undone.</p>
+            <div style="display: flex; justify-content: center; gap: 1rem;">
+                <button class="btn btn-outline" onclick="closeModal('deleteModal')" style="min-width: 100px;">Cancel</button>
+                <button class="btn btn-danger" id="confirmDeleteBtn" style="min-width: 100px; background: #ff4757; color: #fff; border: none;">Yes, Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/admin.js"></script>
+</body>
+</html>
