@@ -8,7 +8,8 @@ const profileSchema = new mongoose.Schema({
     location: { type: String },
     linkedin: { type: String },
     github: { type: String },
-    resumeLink: { type: String }
+    resumeLink: { type: String },
+    profileImage: { type: String, default: 'assets/profile.jpg' }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Profile', profileSchema);

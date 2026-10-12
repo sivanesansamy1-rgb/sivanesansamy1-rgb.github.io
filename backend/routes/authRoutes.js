@@ -11,9 +11,13 @@ const generateToken = (id) => {
 // @desc    Auth admin & get token
 // @access  Public
 router.post('/login', async (req, res) => {
-    const { email, password } = req.body;
+    let { email, password } = req.body;
     try {
-        const admin = await Admin.findOne({ email });
+        if (!email || !password) {
+            return res.status(400).json({ message: 'Please provide both email and password' });
+        }
+        email = email.trim();
+        const admin = await Admin.findOne({ email: { $regex: new RegExp(`^${email}$`, 'i') } });
 
         if (admin && (await admin.matchPassword(password))) {
             res.json({
@@ -25,6 +29,7 @@ router.post('/login', async (req, res) => {
             res.status(401).json({ message: 'Invalid email or password' });
         }
     } catch (error) {
+        console.error('Login error:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });

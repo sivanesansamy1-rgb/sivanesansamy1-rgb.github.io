@@ -1,9 +1,24 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Immediate theme initialization to match system theme on first visit and prevent FOUC -->
+    <script>
+        (function () {
+            try {
+                var isOverridden = localStorage.getItem('portfolio-theme-overridden') === 'true';
+                var savedTheme = localStorage.getItem('portfolio-theme');
+                var systemTheme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+                var activeTheme = (isOverridden && savedTheme) ? savedTheme : systemTheme;
+                document.documentElement.setAttribute('data-theme', activeTheme);
+            } catch (e) {
+                var fallbackTheme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', fallbackTheme);
+            }
+        })();
+    </script>
     <title>Sivanesan S | Portfolio</title>
 
     <!-- Google Fonts -->

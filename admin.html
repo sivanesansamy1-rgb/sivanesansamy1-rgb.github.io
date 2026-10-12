@@ -1,8 +1,23 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Immediate theme initialization to match system theme on first visit and prevent FOUC -->
+    <script>
+        (function () {
+            try {
+                var isOverridden = localStorage.getItem('portfolio-theme-overridden') === 'true';
+                var savedTheme = localStorage.getItem('portfolio-theme');
+                var systemTheme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+                var activeTheme = (isOverridden && savedTheme) ? savedTheme : systemTheme;
+                document.documentElement.setAttribute('data-theme', activeTheme);
+            } catch (e) {
+                var fallbackTheme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', fallbackTheme);
+            }
+        })();
+    </script>
     <title>Portfolio Admin Dashboard</title>
     
     <!-- Google Fonts -->
@@ -128,7 +143,28 @@
 
                 <!-- Profile View -->
                 <section id="view-profile" class="admin-view">
-                    <h3>Edit Profile</h3>
+                    <h3>Profile Picture</h3>
+                    <div style="background: var(--bg-surface); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 2rem;">
+                        <div style="display: flex; align-items: center; gap: 2rem; flex-wrap: wrap;">
+                            <div style="width: 120px; height: 120px; border-radius: 50%; overflow: hidden; border: 3px solid var(--accent-cyan); position: relative; background: var(--bg-surface); flex-shrink: 0; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                                <img id="profile-pic-preview" src="assets/profile.jpg" alt="Profile Preview" style="width: 100%; height: 100%; object-fit: cover; object-position: center 20%;" onerror="this.src='assets/profile.jpg'">
+                            </div>
+                            <form id="profilePicUploadForm" style="flex: 1; min-width: 250px;">
+                                <div class="form-group" style="margin-bottom: 1rem;">
+                                    <label for="profile-pic-file" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Select New Profile Photo (JPG, PNG, WEBP)</label>
+                                    <input type="file" id="profile-pic-file" accept="image/*" required style="padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; width: 100%; color: var(--text-primary); background: var(--bg-main);">
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <button type="submit" class="btn btn-primary" id="uploadPicBtn">
+                                        <i class="fa-solid fa-cloud-arrow-up"></i> Upload Profile Picture
+                                    </button>
+                                    <span id="profilePicMsg" class="success-msg"></span>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <h3>Edit Profile Details</h3>
                     <form id="profileForm" class="admin-form">
                         <div class="form-row">
                             <div class="form-group">

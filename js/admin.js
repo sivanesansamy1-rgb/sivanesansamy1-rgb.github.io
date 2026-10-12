@@ -1,6 +1,13 @@
-const API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-    ? 'http://localhost:5000/api'
-    : 'https://portfolio-backend-51pc.onrender.com/api';
+const LOCAL_API = 'http://localhost:5000/api';
+const PROD_API = 'https://portfolio-backend-51pc.onrender.com/api';
+
+const isLocalHost = window.location.hostname === 'localhost' || 
+                    window.location.hostname === '127.0.0.1' || 
+                    window.location.protocol === 'file:' || 
+                    !window.location.hostname;
+
+let API_URL = isLocalHost ? LOCAL_API : PROD_API;
+let FALLBACK_API_URL = isLocalHost ? PROD_API : LOCAL_API;
 let token = sessionStorage.getItem('adminToken');
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -8,30 +15,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Theme Management (Dark/Light Mode)
     const htmlElement = document.documentElement;
-    const savedTheme = localStorage.getItem('portfolio-theme');
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    if (savedTheme) {
-        htmlElement.setAttribute('data-theme', savedTheme);
-    } else {
-        const defaultTheme = systemPrefersDark ? 'dark' : 'light';
-        htmlElement.setAttribute('data-theme', defaultTheme);
-        localStorage.setItem('portfolio-theme', defaultTheme);
+
+    function getSystemTheme() {
+        return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
     }
 
-    // Listen for system theme changes
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-        if (!localStorage.getItem('portfolio-theme-overridden')) {
-            const newTheme = e.matches ? 'dark' : 'light';
-            htmlElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('portfolio-theme', newTheme);
-        }
-    });
+    function initTheme() {
+        const isOverridden = localStorage.getItem('portfolio-theme-overridden') === 'true';
+        const savedTheme = localStorage.getItem('portfolio-theme');
+        const theme = (isOverridden && savedTheme) ? savedTheme : getSystemTheme();
+        htmlElement.setAttribute('data-theme', theme);
+    }
+
+    initTheme();
+
+    // Listen for system theme changes (updates if not manually overridden)
+    if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            const isOverridden = localStorage.getItem('portfolio-theme-overridden') === 'true';
+            if (!isOverridden) {
+                const newTheme = e.matches ? 'dark' : 'light';
+                htmlElement.setAttribute('data-theme', newTheme);
+            }
+        });
+    }
 
     const themeToggles = document.querySelectorAll('.theme-toggle');
     themeToggles.forEach(toggle => {
         toggle.addEventListener('click', () => {
-            const currentTheme = htmlElement.getAttribute('data-theme');
+            const currentTheme = htmlElement.getAttribute('data-theme') || getSystemTheme();
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
             htmlElement.setAttribute('data-theme', newTheme);
             localStorage.setItem('portfolio-theme', newTheme);
@@ -55,18 +67,59 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Login Form
     const loginForm = document.getElementById('loginForm');
+    const loginError = document.getElementById('loginError');
+
+    // Automatically clear error message when typing
+    ['email', 'password'].forEach(fieldId => {
+        const input = document.getElementById(fieldId);
+        if (input) {
+            input.addEventListener('input', () => {
+                if (loginError) {
+                    loginError.textContent = '';
+                    loginError.style.display = 'none';
+                }
+            });
+        }
+    });
+
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('email').value;
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
+            const submitBtn = loginForm.querySelector('button[type="submit"]');
+
+            if (loginError) {
+                loginError.textContent = '';
+                loginError.style.display = 'none';
+            }
+
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Logging in...';
+            }
             
             try {
-                const res = await fetch(`${API_URL}/auth/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-                });
+                let res;
+                try {
+                    res = await fetch(`${API_URL}/auth/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    });
+                } catch (networkErr) {
+                    if (FALLBACK_API_URL && FALLBACK_API_URL !== API_URL) {
+                        console.warn(`Primary endpoint (${API_URL}) failed, trying fallback (${FALLBACK_API_URL})...`);
+                        res = await fetch(`${FALLBACK_API_URL}/auth/login`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email, password })
+                        });
+                        API_URL = FALLBACK_API_URL;
+                    } else {
+                        throw networkErr;
+                    }
+                }
                 
                 const data = await res.json();
                 
@@ -75,13 +128,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     token = data.token;
                     checkAuth();
                 } else {
-                    document.getElementById('loginError').textContent = data.message;
-                    document.getElementById('loginError').style.display = 'block';
+                    if (loginError) {
+                        loginError.textContent = data.message || 'Invalid credentials';
+                        loginError.style.display = 'block';
+                    }
                 }
             } catch (err) {
-                console.error(err);
-                document.getElementById('loginError').textContent = 'Server connection failed';
-                document.getElementById('loginError').style.display = 'block';
+                console.error('Login error:', err);
+                if (loginError) {
+                    loginError.textContent = 'Server connection failed. Ensure backend is running (npm run dev) or try again in a moment.';
+                    loginError.style.display = 'block';
+                }
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Login';
+                }
             }
         });
     }
@@ -130,6 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Forms setup
     setupProjectForm();
     setupProfileForm();
+    setupProfilePicForm();
     setupResumeForm();
     setupSkillForm();
     setupExperienceForm();
@@ -197,6 +260,11 @@ async function loadProfile() {
         if (res.ok) {
             const profile = await res.json();
             if (profile) {
+                const preview = document.getElementById('profile-pic-preview');
+                if (preview) {
+                    const picUrl = profile.profileImage || 'assets/profile.jpg';
+                    preview.src = `${picUrl}?v=${Date.now()}`;
+                }
                 document.getElementById('prof-name').value = profile.name || '';
                 document.getElementById('prof-role').value = profile.role || '';
                 document.getElementById('prof-about').value = profile.aboutText || '';
@@ -243,6 +311,83 @@ function setupProfileForm() {
             }
         } catch(err) {
             console.error(err);
+        }
+    });
+}
+
+function setupProfilePicForm() {
+    const form = document.getElementById('profilePicUploadForm');
+    const fileInput = document.getElementById('profile-pic-file');
+    const preview = document.getElementById('profile-pic-preview');
+    const msg = document.getElementById('profilePicMsg');
+    if (!form || !fileInput) return;
+
+    // Instant local preview when an image file is selected
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files && fileInput.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                if (preview) preview.src = e.target.result;
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+        }
+    });
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!fileInput.files.length) {
+            alert('Please select an image file first.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('profileImage', fileInput.files[0]);
+
+        const btn = document.getElementById('uploadPicBtn') || form.querySelector('button[type="submit"]');
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Uploading...';
+        btn.disabled = true;
+
+        try {
+            let res;
+            try {
+                res = await fetch(`${API_URL}/upload/profile-image`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+            } catch (networkErr) {
+                if (FALLBACK_API_URL && FALLBACK_API_URL !== API_URL) {
+                    res = await fetch(`${FALLBACK_API_URL}/upload/profile-image`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${token}` },
+                        body: formData
+                    });
+                    API_URL = FALLBACK_API_URL;
+                } else {
+                    throw networkErr;
+                }
+            }
+
+            const data = await res.json();
+            if (res.ok) {
+                if (preview && data.imageUrl) {
+                    preview.src = `${data.imageUrl}?v=${Date.now()}`;
+                }
+                if (msg) {
+                    msg.textContent = 'Profile picture updated successfully!';
+                    setTimeout(() => { if (msg) msg.textContent = ''; }, 4000);
+                }
+                fileInput.value = '';
+            } else {
+                alert(data.message || 'Failed to upload profile picture.');
+            }
+        } catch (err) {
+            console.error('Failed to upload profile picture:', err);
+            alert('Upload failed. Please check your connection and try again.');
+        } finally {
+            btn.innerHTML = originalHtml;
+            btn.disabled = false;
         }
     });
 }

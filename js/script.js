@@ -6,37 +6,42 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeToggle = document.getElementById('theme-toggle');
     const htmlElement = document.documentElement;
 
-    // Check for saved theme in localStorage
-    const savedTheme = localStorage.getItem('portfolio-theme');
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    if (savedTheme) {
-        htmlElement.setAttribute('data-theme', savedTheme);
-    } else {
-        // Default to system theme
-        const defaultTheme = systemPrefersDark ? 'dark' : 'light';
-        htmlElement.setAttribute('data-theme', defaultTheme);
-        localStorage.setItem('portfolio-theme', defaultTheme);
+    function getSystemTheme() {
+        return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
     }
 
-    // Listen for system theme changes
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-        if (!localStorage.getItem('portfolio-theme-overridden')) {
-            const newTheme = e.matches ? 'dark' : 'light';
-            htmlElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('portfolio-theme', newTheme);
-        }
-    });
+    function initTheme() {
+        const isOverridden = localStorage.getItem('portfolio-theme-overridden') === 'true';
+        const savedTheme = localStorage.getItem('portfolio-theme');
+        const theme = (isOverridden && savedTheme) ? savedTheme : getSystemTheme();
+        htmlElement.setAttribute('data-theme', theme);
+    }
+
+    // Initialize theme based on preference or system theme
+    initTheme();
+
+    // Listen for live system theme changes (updates if not manually overridden)
+    if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            const isOverridden = localStorage.getItem('portfolio-theme-overridden') === 'true';
+            if (!isOverridden) {
+                const newTheme = e.matches ? 'dark' : 'light';
+                htmlElement.setAttribute('data-theme', newTheme);
+            }
+        });
+    }
 
     // Toggle theme on button click
-    themeToggle.addEventListener('click', () => {
-        const currentTheme = htmlElement.getAttribute('data-theme');
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-theme') || getSystemTheme();
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
 
-        htmlElement.setAttribute('data-theme', newTheme);
-        localStorage.setItem('portfolio-theme', newTheme);
-        localStorage.setItem('portfolio-theme-overridden', 'true');
-    });
+            htmlElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('portfolio-theme', newTheme);
+            localStorage.setItem('portfolio-theme-overridden', 'true');
+        });
+    }
 
     /* =========================================
        2. Custom Cursor
@@ -356,6 +361,26 @@ document.addEventListener('DOMContentLoaded', () => {
             image: "assets/projects/wine-quality.jpg",
             liveLink: "#",
             githubLink: "#"
+        },
+        {
+            title: "Text-Similarity-Finder",
+            category: "AI/ML",
+            filterId: "ai-ml",
+            description: "Technologies: Python, scikit-learn, NumPy Converted each input document into TF-IDF vectors for similarity analysis. Calculated pairwise cosine similarity scores between userprovided text inputs.",
+            technologies: ["Python", "scikit-learn", "NumPy", "TF-IDF vectors"],
+            image: "assets/projects/text-similarity-finder.png",
+            liveLink: "#",
+            githubLink: "https://github.com/sivanesansamy1-rgb/Text-similarity-finder"
+        },
+        {
+            title: "Machine Generated Content Detection",
+            category: "Machine Learning",
+            filterId: "machine-learning",
+            description: "Machine-Generated Content Detection using LSTM, BiLSTM, BERT, DistilBERT, and RoBERTa to classify AI-generated and human-written text. It uses the benchmark datasets like, RAID, MAGE, HC3+ and AI-DETECTION-PILE were used and the results were evaluated based on accuracy, precision, recall, and F1-score.",
+            technologies: ["Python", "Machine learning"],
+            image: "assets/projects/machine-generated-content-detection.jpg",
+            liveLink: "#",
+            githubLink: "https://github.com/sivanesansamy1-rgb/Macine-Generated-Content-Detection-"
         }
     ];
 
@@ -412,14 +437,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
 
-            // Add click listener to the card
-            card.style.cursor = 'pointer';
-            card.addEventListener('click', (e) => {
-                // Prevent redirect if clicking the action buttons directly
-                if (!e.target.closest('.card-action-btn')) {
-                    openModal(project);
-                }
-            });
+
 
             projectsContainer.appendChild(card);
         });
@@ -586,7 +604,11 @@ document.addEventListener('DOMContentLoaded', () => {
        12.7. Backend Integration (Dynamic Fetching)
     ========================================= */
     async function fetchBackendData() {
-        const API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+        const isLocalHost = window.location.hostname === 'localhost' || 
+                            window.location.hostname === '127.0.0.1' || 
+                            window.location.protocol === 'file:' || 
+                            !window.location.hostname;
+        const API_URL = isLocalHost
             ? 'http://localhost:5000/api'
             : 'https://portfolio-backend-51pc.onrender.com/api';
 
@@ -614,6 +636,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     const aboutEl = document.querySelector('.about-text p');
                     if (aboutEl) aboutEl.textContent = profile.aboutText;
+
+                    if (profile.profileImage) {
+                        const profileSrc = `${profile.profileImage}?v=${new Date(profile.updatedAt || Date.now()).getTime()}`;
+                        const heroProfileImg = document.querySelector('.profile-img');
+                        if (heroProfileImg) {
+                            heroProfileImg.src = profileSrc;
+                            heroProfileImg.style.display = 'block';
+                            heroProfileImg.parentElement.classList.remove('no-image');
+                        }
+                        const aboutProfileImg = document.querySelector('.about-img-container img');
+                        if (aboutProfileImg) {
+                            aboutProfileImg.src = profileSrc;
+                            aboutProfileImg.style.display = 'block';
+                            aboutProfileImg.parentElement.classList.remove('no-image');
+                        }
+                    }
                 }
             }
 

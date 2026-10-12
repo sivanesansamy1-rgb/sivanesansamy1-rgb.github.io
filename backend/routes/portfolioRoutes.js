@@ -53,6 +53,28 @@ const uploadProjectImage = multer({
     }
 });
 
+// Configure Multer for profile image
+const profileImageStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, path.join(__dirname, '../../assets'));
+    },
+    filename: function (req, file, cb) {
+        const ext = path.extname(file.originalname).toLowerCase() || '.jpg';
+        cb(null, 'profile' + ext);
+    }
+});
+
+const uploadProfileImage = multer({
+    storage: profileImageStorage,
+    fileFilter: function (req, file, cb) {
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Only image files are allowed!'), false);
+        }
+    }
+});
+
 // ==========================================
 // PROFILE ROUTES
 // ==========================================
@@ -158,6 +180,31 @@ router.post('/upload/project-image', protect, uploadProjectImage.single('image')
         res.status(200).json({ imageUrl: 'assets/projects/' + req.file.filename });
     } catch (error) {
         res.status(500).json({ message: 'Server error during image upload' });
+    }
+});
+
+router.post('/upload/profile-image', protect, uploadProfileImage.single('profileImage'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: 'No image uploaded' });
+        }
+        const imageUrl = 'assets/' + req.file.filename;
+        let profile = await Profile.findOne();
+        if (profile) {
+            profile.profileImage = imageUrl;
+            await profile.save();
+        } else {
+            profile = await Profile.create({
+                name: 'Sivanesan S',
+                role: 'Full Stack Developer',
+                aboutText: '',
+                profileImage: imageUrl
+            });
+        }
+        res.status(200).json({ message: 'Profile picture updated successfully', imageUrl: imageUrl });
+    } catch (error) {
+        console.error('Profile image upload error:', error);
+        res.status(500).json({ message: 'Server error during profile image upload' });
     }
 });
 

@@ -69,6 +69,26 @@ mongoose.connect(process.env.MONGO_URI, {
             image: "assets/projects/wine-quality.jpg",
             liveLink: "#",
             githubLink: "#"
+        },
+        {
+            title: "Text-Similarity-Finder",
+            category: "AI/ML",
+            filterId: "ai-ml",
+            description: "Technologies: Python, scikit-learn, NumPy Converted each input document into TF-IDF vectors for similarity analysis. Calculated pairwise cosine similarity scores between userprovided text inputs.",
+            technologies: ["Python", "scikit-learn", "NumPy", "TF-IDF vectors"],
+            image: "assets/projects/text-similarity-finder.png",
+            liveLink: "#",
+            githubLink: "https://github.com/sivanesansamy1-rgb/Text-similarity-finder"
+        },
+        {
+            title: "Machine Generated Content Detection",
+            category: "Machine Learning",
+            filterId: "machine-learning",
+            description: "Machine-Generated Content Detection using LSTM, BiLSTM, BERT, DistilBERT, and RoBERTa to classify AI-generated and human-written text. It uses the benchmark datasets like, RAID, MAGE, HC3+ and AI-DETECTION-PILE were used and the results were evaluated based on accuracy, precision, recall, and F1-score.",
+            technologies: ["Python", "Machine learning"],
+            image: "assets/projects/machine-generated-content-detection.jpg",
+            liveLink: "#",
+            githubLink: "https://github.com/sivanesansamy1-rgb/Macine-Generated-Content-Detection-"
         }
     ];
     await Project.insertMany(projects);
