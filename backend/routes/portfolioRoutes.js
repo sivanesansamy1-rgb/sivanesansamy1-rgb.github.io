@@ -82,10 +82,9 @@ router.get('/profile', async (req, res) => {
         if (resumeDoc) {
             profileData.hasCustomResume = true;
             profileData.resumeUpdatedAt = resumeDoc.updatedAt;
-            // If resumeLink is empty or points to API resume, provide fresh cache-busted endpoint
-            if (!profileData.resumeLink || profileData.resumeLink.includes('/api/resume')) {
-                profileData.resumeLink = `/api/resume?v=${new Date(resumeDoc.updatedAt).getTime()}`;
-            }
+        }
+        if (!profileData.resumeLink || profileData.resumeLink.includes('/api/resume')) {
+            profileData.resumeLink = 'assets/resume.pdf';
         }
 
         res.json(profileData);
@@ -209,7 +208,7 @@ router.post('/upload/resume', protect, uploadResume.single('resume'), async (req
         // 3. Update Profile model with the resumeLink
         let profile = await Profile.findOne();
         if (profile) {
-            profile.resumeLink = resumeUrl;
+            profile.resumeLink = 'assets/resume.pdf';
             await profile.save();
         }
 

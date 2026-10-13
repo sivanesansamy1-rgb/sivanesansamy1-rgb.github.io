@@ -699,28 +699,25 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
 
-                    // Dynamically update resume links if configured in backend
+                    // Dynamically update resume links (points reliably to assets/resume.pdf with cache-buster)
+                    let finalResumeUrl = `assets/resume.pdf?v=${new Date(profile.updatedAt || Date.now()).getTime()}`;
                     if (profile.resumeLink) {
-                        let finalResumeUrl = profile.resumeLink;
-                        if (profile.resumeLink.startsWith('/api/')) {
-                            const baseUrl = API_URL.replace(/\/api$/, '');
-                            finalResumeUrl = `${baseUrl}${profile.resumeLink}`;
-                        } else if (!profile.resumeLink.startsWith('http://') && !profile.resumeLink.startsWith('https://')) {
-                            finalResumeUrl = `${API_URL}/${profile.resumeLink.replace(/^\//, '')}`;
+                        if (profile.resumeLink.startsWith('http://') || profile.resumeLink.startsWith('https://')) {
+                            // External hosted link (e.g. Google Drive, Cloudinary)
+                            finalResumeUrl = profile.resumeLink;
+                        } else if (profile.resumeLink.startsWith('assets/')) {
+                            finalResumeUrl = `${profile.resumeLink}?v=${new Date(profile.updatedAt || Date.now()).getTime()}`;
                         }
+                    }
 
-                        const resumeButtons = document.querySelectorAll('.resume-btn, .nav-mobile-resume');
-                        resumeButtons.forEach(btn => {
-                            btn.href = finalResumeUrl;
-                        });
+                    const resumeButtons = document.querySelectorAll('.resume-btn, .nav-mobile-resume');
+                    resumeButtons.forEach(btn => {
+                        btn.href = finalResumeUrl;
+                    });
 
-                        const downloadBtn = document.querySelector('a[download]');
-                        if (downloadBtn) {
-                            const dlUrl = finalResumeUrl.includes('?')
-                                ? `${finalResumeUrl}&download=true`
-                                : `${finalResumeUrl}?download=true`;
-                            downloadBtn.href = dlUrl;
-                        }
+                    const downloadBtn = document.querySelector('a[download]');
+                    if (downloadBtn) {
+                        downloadBtn.href = finalResumeUrl.startsWith('http') ? finalResumeUrl : 'assets/resume.pdf';
                     }
                 }
             }
