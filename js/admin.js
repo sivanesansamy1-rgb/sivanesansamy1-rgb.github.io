@@ -315,33 +315,106 @@ function setupProfileForm() {
     });
 }
 
+let currentProfilePicFile = null;
+
+function applyProfilePicFile(file, isPasted = false) {
+    if (!file || !file.type.startsWith('image/')) return;
+    currentProfilePicFile = file;
+
+    const fileInput = document.getElementById('profile-pic-file');
+    const preview = document.getElementById('profile-pic-preview');
+    const nameEl = document.getElementById('profile-pic-name');
+    const dropzone = document.getElementById('profile-pic-dropzone');
+
+    if (fileInput) {
+        try {
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            fileInput.files = dataTransfer.files;
+        } catch (e) {}
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        if (preview) preview.src = e.target.result;
+        if (nameEl) {
+            nameEl.textContent = `${isPasted ? '📋 Pasted: ' : 'Selected: '}${file.name} (${formatBytes(file.size)})`;
+        }
+        if (dropzone) {
+            dropzone.classList.remove('paste-flash');
+            void dropzone.offsetWidth;
+            dropzone.classList.add('paste-flash');
+        }
+        if (isPasted) {
+            showPasteToast('Profile photo pasted! Click "Upload Profile Picture" to save.');
+        }
+    };
+    reader.readAsDataURL(file);
+}
+
 function setupProfilePicForm() {
     const form = document.getElementById('profilePicUploadForm');
     const fileInput = document.getElementById('profile-pic-file');
     const preview = document.getElementById('profile-pic-preview');
     const msg = document.getElementById('profilePicMsg');
+    const dropzone = document.getElementById('profile-pic-dropzone');
     if (!form || !fileInput) return;
 
-    // Instant local preview when an image file is selected
+    if (dropzone) {
+        dropzone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropzone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropzone.classList.add('drag-over');
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropzone.classList.remove('drag-over');
+            });
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                const file = e.dataTransfer.files[0];
+                if (file.type.startsWith('image/')) {
+                    applyProfilePicFile(file, false);
+                }
+            }
+        });
+
+        dropzone.addEventListener('paste', (e) => {
+            const file = extractImageFromClipboard(e);
+            if (file) {
+                e.preventDefault();
+                e.stopPropagation();
+                applyProfilePicFile(file, true);
+            }
+        });
+    }
+
+    // Instant local preview when an image file is selected via file picker
     fileInput.addEventListener('change', () => {
         if (fileInput.files && fileInput.files[0]) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                if (preview) preview.src = e.target.result;
-            };
-            reader.readAsDataURL(fileInput.files[0]);
+            applyProfilePicFile(fileInput.files[0], false);
         }
     });
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        if (!fileInput.files.length) {
-            alert('Please select an image file first.');
+        const fileToUpload = currentProfilePicFile || (fileInput.files && fileInput.files[0]);
+        if (!fileToUpload) {
+            alert('Please select or paste an image file first.');
             return;
         }
 
         const formData = new FormData();
-        formData.append('profileImage', fileInput.files[0]);
+        formData.append('profileImage', fileToUpload);
 
         const btn = document.getElementById('uploadPicBtn') || form.querySelector('button[type="submit"]');
         const originalHtml = btn.innerHTML;
@@ -378,7 +451,11 @@ function setupProfilePicForm() {
                     msg.textContent = 'Profile picture updated successfully!';
                     setTimeout(() => { if (msg) msg.textContent = ''; }, 4000);
                 }
+                currentProfilePicFile = null;
                 fileInput.value = '';
+                const nameEl = document.getElementById('profile-pic-name');
+                if (nameEl) nameEl.textContent = '';
+                showPasteToast('Profile picture saved successfully!');
             } else {
                 alert(data.message || 'Failed to upload profile picture.');
             }
@@ -440,32 +517,288 @@ function setupResumeForm() {
 }
 
 // -----------------------------------------
+// -----------------------------------------
+// IMAGE PASTE & DROPZONE HELPERS
+// -----------------------------------------
+
+function showPasteToast(message, isSuccess = true) {
+    const existing = document.querySelector('.paste-toast');
+    if (existing) existing.remove();
+
+    const toast = document.createElement('div');
+    toast.className = 'paste-toast';
+    toast.innerHTML = `
+        <i class="fa-solid ${isSuccess ? 'fa-circle-check' : 'fa-circle-exclamation'}" style="color: ${isSuccess ? '#2ed573' : '#ff4757'}"></i>
+        <span>${message}</span>
+    `;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(20px)';
+        toast.style.transition = 'all 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+    }, 3500);
+}
+
+function extractImageFromClipboard(e) {
+    if (!e.clipboardData) return null;
+    const items = e.clipboardData.items;
+    if (items) {
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].type && items[i].type.startsWith('image/')) {
+                const blob = items[i].getAsFile();
+                if (blob) {
+                    const ext = blob.type.split('/')[1] || 'png';
+                    const safeExt = ext.replace('+xml', '').replace('jpeg', 'jpg');
+                    return new File([blob], `pasted-${Date.now()}.${safeExt}`, { type: blob.type });
+                }
+            }
+        }
+    }
+    if (e.clipboardData.files && e.clipboardData.files.length > 0) {
+        const file = e.clipboardData.files[0];
+        if (file.type.startsWith('image/')) {
+            return file;
+        }
+    }
+    return null;
+}
+
+function formatBytes(bytes) {
+    if (!bytes || bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
+
+let currentProjectImageFile = null;
+let currentProjectExistingImageUrl = null;
+
+function setProjectImagePreview(src, badgeText = 'Selected Image', fileName = '', isPasted = false) {
+    const dropzone = document.getElementById('proj-image-dropzone');
+    const prompt = document.getElementById('proj-dropzone-prompt');
+    const previewContainer = document.getElementById('proj-dropzone-preview');
+    const previewImg = document.getElementById('proj-image-preview');
+    const badge = document.getElementById('proj-image-badge');
+    const nameEl = document.getElementById('proj-image-name');
+
+    if (!dropzone || !previewContainer || !previewImg) return;
+
+    previewImg.src = src;
+    previewContainer.style.display = 'block';
+    if (prompt) prompt.style.display = 'none';
+
+    if (badge) {
+        badge.textContent = badgeText;
+        if (isPasted) {
+            badge.classList.add('pasted');
+            badge.innerHTML = '<i class="fa-regular fa-paste"></i> Pasted from Clipboard';
+        } else {
+            badge.classList.remove('pasted');
+        }
+    }
+
+    if (nameEl) {
+        nameEl.textContent = fileName;
+    }
+
+    dropzone.classList.remove('paste-flash');
+    void dropzone.offsetWidth;
+    dropzone.classList.add('paste-flash');
+}
+
+function clearProjectImage(preserveExistingIfAny = false) {
+    const dropzone = document.getElementById('proj-image-dropzone');
+    const prompt = document.getElementById('proj-dropzone-prompt');
+    const previewContainer = document.getElementById('proj-dropzone-preview');
+    const previewImg = document.getElementById('proj-image-preview');
+    const fileInput = document.getElementById('proj-image');
+    const nameEl = document.getElementById('proj-image-name');
+
+    currentProjectImageFile = null;
+    if (fileInput) fileInput.value = '';
+
+    if (preserveExistingIfAny && currentProjectExistingImageUrl) {
+        setProjectImagePreview(
+            currentProjectExistingImageUrl.startsWith('http') ? currentProjectExistingImageUrl : `/${currentProjectExistingImageUrl}`,
+            'Current Image',
+            `Current: ${currentProjectExistingImageUrl.split('/').pop()}`,
+            false
+        );
+        return;
+    }
+
+    currentProjectExistingImageUrl = null;
+    if (previewImg) previewImg.src = '';
+    if (previewContainer) previewContainer.style.display = 'none';
+    if (prompt) prompt.style.display = 'flex';
+    if (nameEl) nameEl.textContent = '';
+    if (dropzone) dropzone.classList.remove('paste-flash');
+}
+
+function applyProjectImageFile(file, isPasted = false) {
+    if (!file || !file.type.startsWith('image/')) return;
+    currentProjectImageFile = file;
+
+    const fileInput = document.getElementById('proj-image');
+    if (fileInput) {
+        try {
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            fileInput.files = dataTransfer.files;
+        } catch (e) {}
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const sizeText = formatBytes(file.size);
+        const fileName = `${file.name} (${sizeText})`;
+        setProjectImagePreview(
+            e.target.result,
+            isPasted ? 'Pasted from Clipboard' : 'Selected Image',
+            fileName,
+            isPasted
+        );
+        if (isPasted) {
+            showPasteToast(`Project image pasted (${sizeText})!`);
+        }
+    };
+    reader.readAsDataURL(file);
+}
+
+function setupProjectDropzone() {
+    const dropzone = document.getElementById('proj-image-dropzone');
+    const fileInput = document.getElementById('proj-image');
+    const replaceBtn = document.getElementById('proj-replace-btn');
+    const removeBtn = document.getElementById('proj-remove-btn');
+
+    if (!dropzone || !fileInput) return;
+
+    dropzone.addEventListener('click', (e) => {
+        if (e.target.closest('.preview-actions')) return;
+        fileInput.click();
+    });
+
+    if (replaceBtn) {
+        replaceBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            fileInput.click();
+        });
+    }
+
+    if (removeBtn) {
+        removeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            clearProjectImage(false);
+        });
+    }
+
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files && fileInput.files[0]) {
+            applyProjectImageFile(fileInput.files[0], false);
+        }
+    });
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropzone.classList.add('drag-over');
+        });
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropzone.classList.remove('drag-over');
+        });
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+        if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            const file = e.dataTransfer.files[0];
+            if (file.type.startsWith('image/')) {
+                applyProjectImageFile(file, false);
+            } else {
+                alert('Please drop an image file (PNG, JPG, WEBP, etc.).');
+            }
+        }
+    });
+
+    dropzone.addEventListener('paste', (e) => {
+        const file = extractImageFromClipboard(e);
+        if (file) {
+            e.preventDefault();
+            e.stopPropagation();
+            applyProjectImageFile(file, true);
+        }
+    });
+}
+
+// Global paste listener: catches Ctrl+V anywhere when Project Modal or Profile View is active
+document.addEventListener('paste', (e) => {
+    const imageFile = extractImageFromClipboard(e);
+    if (!imageFile) return;
+
+    const projectModal = document.getElementById('projectModal');
+    if (projectModal && projectModal.classList.contains('active')) {
+        e.preventDefault();
+        applyProjectImageFile(imageFile, true);
+        return;
+    }
+
+    const profileView = document.getElementById('view-profile');
+    if (profileView && profileView.classList.contains('active-view')) {
+        e.preventDefault();
+        applyProfilePicFile(imageFile, true);
+        return;
+    }
+});
+
+// -----------------------------------------
 // PROJECTS CRUD
 // -----------------------------------------
 
 async function loadProjects() {
     const tbody = document.getElementById('projectsTableBody');
-    tbody.innerHTML = '<tr><td colspan="3">Loading...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="4">Loading...</td></tr>';
     try {
-        const res = await fetch(`${API_URL}/projects`);
-        if (res.ok) {
+        let res;
+        try {
+            res = await fetch(`${API_URL}/projects`);
+        } catch (networkErr) {
+            if (FALLBACK_API_URL && FALLBACK_API_URL !== API_URL) {
+                res = await fetch(`${FALLBACK_API_URL}/projects`);
+                API_URL = FALLBACK_API_URL;
+            } else {
+                throw networkErr;
+            }
+        }
+
+        if (res && res.ok) {
             const projects = await res.json();
             tbody.innerHTML = '';
             projects.forEach(p => {
                 const tr = document.createElement('tr');
+                const imgSrc = p.image ? (p.image.startsWith('http') ? p.image : `/${p.image}`) : '';
                 tr.innerHTML = `
-                    <td>${p.title}</td>
-                    <td>${p.category}</td>
                     <td>
-                        <button class="btn btn-primary btn-small" onclick="editProject('${p._id}')">Edit</button>
-                        <button class="btn btn-danger btn-small" onclick="deleteProject('${p._id}')">Delete</button>
+                        ${imgSrc ? `<img src="${imgSrc}" class="table-img-thumb" alt="${p.title}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><div class="table-img-placeholder" style="display:none;"><i class="fa-solid fa-image"></i></div>` : `<div class="table-img-placeholder"><i class="fa-solid fa-image"></i></div>`}
+                    </td>
+                    <td><strong>${p.title}</strong></td>
+                    <td><span class="preview-badge">${p.category}</span></td>
+                    <td>
+                        <button class="btn btn-primary btn-small" onclick="editProject('${p._id}')"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+                        <button class="btn btn-danger btn-small" onclick="deleteProject('${p._id}')"><i class="fa-solid fa-trash"></i> Delete</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
         }
     } catch(err) {
-        tbody.innerHTML = '<tr><td colspan="3">Error loading data.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4">Error loading data.</td></tr>';
     }
 }
 
@@ -473,6 +806,8 @@ function setupProjectForm() {
     const form = document.getElementById('projectForm');
     if (!form) return;
     
+    setupProjectDropzone();
+
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const id = document.getElementById('proj-id').value;
@@ -483,18 +818,33 @@ function setupProjectForm() {
         
         try {
             let imageUrl = null;
-            const fileInput = document.getElementById('proj-image');
-            if (fileInput && fileInput.files.length > 0) {
+            const fileToUpload = currentProjectImageFile || (document.getElementById('proj-image')?.files[0]);
+
+            if (fileToUpload) {
                 const formData = new FormData();
-                formData.append('image', fileInput.files[0]);
+                formData.append('image', fileToUpload);
                 
-                const uploadRes = await fetch(`${API_URL}/upload/project-image`, {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}` },
-                    body: formData
-                });
+                let uploadRes;
+                try {
+                    uploadRes = await fetch(`${API_URL}/upload/project-image`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${token}` },
+                        body: formData
+                    });
+                } catch (networkErr) {
+                    if (FALLBACK_API_URL && FALLBACK_API_URL !== API_URL) {
+                        uploadRes = await fetch(`${FALLBACK_API_URL}/upload/project-image`, {
+                            method: 'POST',
+                            headers: { 'Authorization': `Bearer ${token}` },
+                            body: formData
+                        });
+                        API_URL = FALLBACK_API_URL;
+                    } else {
+                        throw networkErr;
+                    }
+                }
                 
-                if (uploadRes.ok) {
+                if (uploadRes && uploadRes.ok) {
                     const uploadData = await uploadRes.json();
                     imageUrl = uploadData.imageUrl;
                 }
@@ -512,26 +862,51 @@ function setupProjectForm() {
             
             if (imageUrl) {
                 data.image = imageUrl;
+            } else if (currentProjectExistingImageUrl) {
+                data.image = currentProjectExistingImageUrl;
             }
             
             const method = id ? 'PUT' : 'POST';
             const url = id ? `${API_URL}/projects/${id}` : `${API_URL}/projects`;
             
-            const res = await fetch(url, {
-                method: method,
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(data)
-            });
-            if (res.ok) {
+            let res;
+            try {
+                res = await fetch(url, {
+                    method: method,
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(data)
+                });
+            } catch (networkErr) {
+                if (FALLBACK_API_URL && FALLBACK_API_URL !== API_URL) {
+                    const fallbackUrl = id ? `${FALLBACK_API_URL}/projects/${id}` : `${FALLBACK_API_URL}/projects`;
+                    res = await fetch(fallbackUrl, {
+                        method: method,
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    API_URL = FALLBACK_API_URL;
+                } else {
+                    throw networkErr;
+                }
+            }
+
+            if (res && res.ok) {
                 closeModal('projectModal');
                 loadProjects();
                 fetchStats();
+                showPasteToast('Project saved successfully!');
+            } else {
+                alert('Failed to save project. Please check fields.');
             }
         } catch(err) {
             console.error(err);
+            alert('An error occurred while saving the project.');
         } finally {
             btn.textContent = originalText;
             btn.disabled = false;
@@ -541,7 +916,18 @@ function setupProjectForm() {
 
 window.editProject = async (id) => {
     try {
-        const res = await fetch(`${API_URL}/projects`);
+        let res;
+        try {
+            res = await fetch(`${API_URL}/projects`);
+        } catch (networkErr) {
+            if (FALLBACK_API_URL && FALLBACK_API_URL !== API_URL) {
+                res = await fetch(`${FALLBACK_API_URL}/projects`);
+                API_URL = FALLBACK_API_URL;
+            } else {
+                throw networkErr;
+            }
+        }
+
         const projects = await res.json();
         const p = projects.find(x => x._id === id);
         if (p) {
@@ -554,15 +940,17 @@ window.editProject = async (id) => {
             document.getElementById('proj-livelink').value = p.liveLink || '';
             document.getElementById('proj-githublink').value = p.githubLink || '';
             
-            const previewImg = document.getElementById('proj-image-preview');
-            const previewName = document.getElementById('proj-image-name');
             if (p.image) {
-                previewImg.src = p.image.startsWith('http') ? p.image : `/${p.image}`;
-                previewImg.style.display = 'block';
-                previewName.textContent = `Current image: ${p.image.split('/').pop()}`;
+                currentProjectExistingImageUrl = p.image;
+                currentProjectImageFile = null;
+                setProjectImagePreview(
+                    p.image.startsWith('http') ? p.image : `/${p.image}`,
+                    'Current Image',
+                    `Current: ${p.image.split('/').pop()}`,
+                    false
+                );
             } else {
-                previewImg.style.display = 'none';
-                previewName.textContent = '';
+                clearProjectImage(false);
             }
             
             openModal('projectModal');
@@ -931,6 +1319,7 @@ window.deleteCertification = async (id) => {
 window.openModal = (id) => {
     if (id === 'projectModal' && !document.getElementById('proj-id').value) {
         document.getElementById('projectForm').reset();
+        clearProjectImage(false);
     } else if (id === 'skillModal' && !document.getElementById('skill-id').value) {
         document.getElementById('skillForm').reset();
     } else if (id === 'experienceModal' && !document.getElementById('exp-id').value) {
@@ -939,42 +1328,14 @@ window.openModal = (id) => {
         document.getElementById('certificationForm').reset();
     }
     
-    if (id === 'projectModal') {
-        const fileInput = document.getElementById('proj-image');
-        if (fileInput) fileInput.value = '';
-        
-        // Only clear the preview if we are adding a new project (no id)
-        if (!document.getElementById('proj-id').value) {
-            const previewImg = document.getElementById('proj-image-preview');
-            const previewName = document.getElementById('proj-image-name');
-            if (previewImg) previewImg.style.display = 'none';
-            if (previewName) previewName.textContent = '';
-        }
-        
-        // Add event listener to file input for preview
-        if (fileInput && !fileInput.hasAttribute('data-preview-bound')) {
-            fileInput.setAttribute('data-preview-bound', 'true');
-            fileInput.addEventListener('change', function() {
-                if (this.files && this.files[0]) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const previewImg = document.getElementById('proj-image-preview');
-                        const previewName = document.getElementById('proj-image-name');
-                        previewImg.src = e.target.result;
-                        previewImg.style.display = 'block';
-                        previewName.textContent = `Selected new image: ${fileInput.files[0].name}`;
-                    }
-                    reader.readAsDataURL(this.files[0]);
-                }
-            });
-        }
-    }
-    
     document.getElementById(id).classList.add('active');
 };
 window.closeModal = (id) => {
     document.getElementById(id).classList.remove('active');
-    if (id === 'projectModal') document.getElementById('proj-id').value = '';
+    if (id === 'projectModal') {
+        document.getElementById('proj-id').value = '';
+        clearProjectImage(false);
+    }
     if (id === 'skillModal') document.getElementById('skill-id').value = '';
     if (id === 'experienceModal') document.getElementById('exp-id').value = '';
     if (id === 'certificationModal') document.getElementById('cert-id').value = '';

@@ -151,8 +151,15 @@
                             </div>
                             <form id="profilePicUploadForm" style="flex: 1; min-width: 250px;">
                                 <div class="form-group" style="margin-bottom: 1rem;">
-                                    <label for="profile-pic-file" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Select New Profile Photo (JPG, PNG, WEBP)</label>
-                                    <input type="file" id="profile-pic-file" accept="image/*" required style="padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; width: 100%; color: var(--text-primary); background: var(--bg-main);">
+                                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Select or Paste New Profile Photo</label>
+                                    <div class="image-dropzone profile-dropzone" id="profile-pic-dropzone" tabindex="0">
+                                        <input type="file" id="profile-pic-file" accept="image/*" style="display: none;">
+                                        <div class="dropzone-content">
+                                            <i class="fa-solid fa-camera dropzone-icon-small"></i>
+                                            <span class="dropzone-text-small"><strong>Click to browse</strong>, drop file, or press <kbd>Ctrl</kbd>+<kbd>V</kbd> to paste</span>
+                                        </div>
+                                    </div>
+                                    <span id="profile-pic-name" style="color: var(--text-secondary); font-size: 0.85rem; display: block; margin-top: 5px;"></span>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 1rem;">
                                     <button type="submit" class="btn btn-primary" id="uploadPicBtn">
@@ -227,6 +234,7 @@
                         <table class="admin-table">
                             <thead>
                                 <tr>
+                                    <th style="width: 70px;">Image</th>
                                     <th>Title</th>
                                     <th>Category</th>
                                     <th>Actions</th>
@@ -352,10 +360,32 @@
                 </div>
                 <div class="form-group">
                     <label>Project Image (Optional)</label>
-                    <input type="file" id="proj-image" accept="image/*" style="padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; width: 100%; color: var(--text-primary); background: var(--bg-surface);">
-                    <div style="margin-top: 10px;">
-                        <img id="proj-image-preview" src="" alt="Image Preview" style="display: none; max-width: 100%; max-height: 200px; border-radius: 8px; border: 1px solid var(--border-color);">
-                        <p id="proj-image-name" style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 5px;"></p>
+                    <div class="image-dropzone" id="proj-image-dropzone" tabindex="0">
+                        <input type="file" id="proj-image" accept="image/*" style="display: none;">
+                        <div class="dropzone-content" id="proj-dropzone-prompt">
+                            <div class="dropzone-icon">
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                            </div>
+                            <p class="dropzone-text"><strong>Click to browse</strong> or drag & drop image here</p>
+                            <div class="dropzone-paste-badge">
+                                <i class="fa-regular fa-paste"></i> Or press <kbd>Ctrl</kbd> + <kbd>V</kbd> anywhere to paste image
+                            </div>
+                        </div>
+                        <div class="dropzone-preview" id="proj-dropzone-preview" style="display: none;">
+                            <img id="proj-image-preview" src="" alt="Project Image Preview">
+                            <div class="dropzone-overlay">
+                                <span class="preview-badge" id="proj-image-badge">Current Image</span>
+                                <div class="preview-actions">
+                                    <button type="button" class="btn-zone-action" id="proj-replace-btn" title="Paste new image or click to change">
+                                        <i class="fa-solid fa-arrows-rotate"></i> Change / Paste
+                                    </button>
+                                    <button type="button" class="btn-zone-action btn-zone-danger" id="proj-remove-btn" title="Remove image">
+                                        <i class="fa-solid fa-trash"></i> Remove
+                                    </button>
+                                </div>
+                            </div>
+                            <p id="proj-image-name" class="dropzone-filename"></p>
+                        </div>
                     </div>
                 </div>
                 <div class="form-group">
