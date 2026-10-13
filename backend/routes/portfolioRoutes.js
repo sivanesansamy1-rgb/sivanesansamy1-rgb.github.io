@@ -7,24 +7,18 @@ const Experience = require('../models/Experience');
 const Certification = require('../models/Certification');
 const Profile = require('../models/Profile');
 const Education = require('../models/Education');
+const Resume = require('../models/Resume');
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 
-// Configure Multer for resume upload
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        // Save to frontend assets folder (relative to backend/routes/)
-        cb(null, path.join(__dirname, '../../assets'));
-    },
-    filename: function (req, file, cb) {
-        cb(null, 'resume.pdf'); // Always overwrite the exact same file
-    }
-});
-
-const upload = multer({
-    storage: storage,
+// Configure Multer for resume upload (memory storage to persist in MongoDB)
+const resumeMemoryStorage = multer.memoryStorage();
+const uploadResume = multer({
+    storage: resumeMemoryStorage,
+    limits: { fileSize: 15 * 1024 * 1024 }, // 15MB limit
     fileFilter: function (req, file, cb) {
-        if (file.mimetype === 'application/pdf') {
+        if (file.mimetype === 'application/pdf' || file.originalname.toLowerCase().endsWith('.pdf')) {
             cb(null, true);
         } else {
             cb(new Error('Only PDF files are allowed!'), false);
@@ -80,8 +74,21 @@ const uploadProfileImage = multer({
 // ==========================================
 router.get('/profile', async (req, res) => {
     try {
-        const profile = await Profile.findOne();
-        res.json(profile || {});
+        let profile = await Profile.findOne();
+        let profileData = profile ? profile.toObject() : {};
+
+        // Attach dynamic resume info if present in MongoDB
+        const resumeDoc = await Resume.findOne().select('updatedAt filename');
+        if (resumeDoc) {
+            profileData.hasCustomResume = true;
+            profileData.resumeUpdatedAt = resumeDoc.updatedAt;
+            // If resumeLink is empty or points to API resume, provide fresh cache-busted endpoint
+            if (!profileData.resumeLink || profileData.resumeLink.includes('/api/resume')) {
+                profileData.resumeLink = `/api/resume?v=${new Date(resumeDoc.updatedAt).getTime()}`;
+            }
+        }
+
+        res.json(profileData);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
@@ -161,14 +168,109 @@ createCrudRoutes('/education', Education);
 // ==========================================
 // FILE UPLOAD ROUTES
 // ==========================================
-router.post('/upload/resume', protect, upload.single('resume'), (req, res) => {
+// Resume Upload & Serving Routes
+router.post('/upload/resume', protect, uploadResume.single('resume'), async (req, res) => {
     try {
         if (!req.file) {
-            return res.status(400).json({ message: 'No file uploaded or invalid file type' });
+            return res.status(400).json({ message: 'No file uploaded or invalid file type. Please upload a PDF.' });
         }
-        res.status(200).json({ message: 'Resume uploaded successfully' });
+
+        // 1. Save locally as fallback if local assets folder exists
+        try {
+            const localAssetsDir = path.join(__dirname, '../../assets');
+            if (fs.existsSync(localAssetsDir)) {
+                fs.writeFileSync(path.join(localAssetsDir, 'resume.pdf'), req.file.buffer);
+            }
+        } catch (fsErr) {
+            console.warn('Could not write to local filesystem:', fsErr.message);
+        }
+
+        // 2. Save or update PDF buffer directly in MongoDB Atlas (persists across Render restarts)
+        let resumeDoc = await Resume.findOne();
+        if (resumeDoc) {
+            resumeDoc.filename = req.file.originalname || 'resume.pdf';
+            resumeDoc.contentType = req.file.mimetype || 'application/pdf';
+            resumeDoc.data = req.file.buffer;
+            resumeDoc.size = req.file.size;
+            resumeDoc.updatedAt = new Date();
+            await resumeDoc.save();
+        } else {
+            resumeDoc = await Resume.create({
+                filename: req.file.originalname || 'resume.pdf',
+                contentType: req.file.mimetype || 'application/pdf',
+                data: req.file.buffer,
+                size: req.file.size,
+                updatedAt: new Date()
+            });
+        }
+
+        const resumeUrl = `/api/resume?v=${resumeDoc.updatedAt.getTime()}`;
+
+        // 3. Update Profile model with the resumeLink
+        let profile = await Profile.findOne();
+        if (profile) {
+            profile.resumeLink = resumeUrl;
+            await profile.save();
+        }
+
+        res.status(200).json({ 
+            message: 'Resume uploaded successfully!', 
+            url: resumeUrl,
+            filename: resumeDoc.filename,
+            updatedAt: resumeDoc.updatedAt
+        });
     } catch (error) {
-        res.status(500).json({ message: 'Server error during upload' });
+        console.error('Resume upload error:', error);
+        res.status(500).json({ message: 'Server error during upload: ' + error.message });
+    }
+});
+
+// Serve dynamic PDF resume from MongoDB or fallback to static file
+router.get('/resume', async (req, res) => {
+    try {
+        const resumeDoc = await Resume.findOne();
+        if (resumeDoc && resumeDoc.data) {
+            const isDownload = req.query.download === 'true';
+            const filename = resumeDoc.filename || 'Sivanesan_S_Resume.pdf';
+            res.setHeader('Content-Type', resumeDoc.contentType || 'application/pdf');
+            res.setHeader('Content-Disposition', `${isDownload ? 'attachment' : 'inline'}; filename="${filename}"`);
+            res.setHeader('Cache-Control', 'public, max-age=60');
+            return res.send(resumeDoc.data);
+        }
+
+        // Fallback: check if local assets/resume.pdf exists
+        const localPath = path.join(__dirname, '../../assets/resume.pdf');
+        if (fs.existsSync(localPath)) {
+            const isDownload = req.query.download === 'true';
+            if (isDownload) {
+                return res.download(localPath, 'Sivanesan_S_Resume.pdf');
+            }
+            return res.sendFile(localPath);
+        }
+
+        res.status(404).send('Resume not found');
+    } catch (error) {
+        console.error('Error serving resume:', error);
+        res.status(500).send('Server error retrieving resume');
+    }
+});
+
+// Resume metadata endpoint for admin checking
+router.get('/resume/info', async (req, res) => {
+    try {
+        const resumeDoc = await Resume.findOne().select('filename size updatedAt contentType');
+        if (resumeDoc) {
+            return res.json({
+                exists: true,
+                filename: resumeDoc.filename,
+                size: resumeDoc.size,
+                updatedAt: resumeDoc.updatedAt,
+                url: `/api/resume?v=${new Date(resumeDoc.updatedAt).getTime()}`
+            });
+        }
+        res.json({ exists: false });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
     }
 });
 

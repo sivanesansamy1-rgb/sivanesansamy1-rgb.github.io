@@ -698,6 +698,30 @@ document.addEventListener('DOMContentLoaded', () => {
                             aboutProfileImg.parentElement.classList.remove('no-image');
                         }
                     }
+
+                    // Dynamically update resume links if configured in backend
+                    if (profile.resumeLink) {
+                        let finalResumeUrl = profile.resumeLink;
+                        if (profile.resumeLink.startsWith('/api/')) {
+                            const baseUrl = API_URL.replace(/\/api$/, '');
+                            finalResumeUrl = `${baseUrl}${profile.resumeLink}`;
+                        } else if (!profile.resumeLink.startsWith('http://') && !profile.resumeLink.startsWith('https://')) {
+                            finalResumeUrl = `${API_URL}/${profile.resumeLink.replace(/^\//, '')}`;
+                        }
+
+                        const resumeButtons = document.querySelectorAll('.resume-btn, .nav-mobile-resume');
+                        resumeButtons.forEach(btn => {
+                            btn.href = finalResumeUrl;
+                        });
+
+                        const downloadBtn = document.querySelector('a[download]');
+                        if (downloadBtn) {
+                            const dlUrl = finalResumeUrl.includes('?')
+                                ? `${finalResumeUrl}&download=true`
+                                : `${finalResumeUrl}?download=true`;
+                            downloadBtn.href = dlUrl;
+                        }
+                    }
                 }
             }
 

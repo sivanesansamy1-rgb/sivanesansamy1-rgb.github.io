@@ -213,14 +213,21 @@
 
                     <hr style="margin: 2rem 0; border-color: var(--border-color);">
                     
-                    <h3>Upload Resume</h3>
+                    <h3>Resume Management</h3>
                     <form id="resumeUploadForm" class="admin-form">
                         <div class="form-group">
                             <label>Select PDF Resume</label>
                             <input type="file" id="resume-file" accept="application/pdf" required style="padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; width: 100%; color: var(--text-primary); background: var(--bg-surface);">
                         </div>
-                        <button type="submit" class="btn btn-secondary">Upload Resume</button>
-                        <span id="resumeMsg" class="success-msg"></span>
+                        <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                            <button type="submit" class="btn btn-secondary">
+                                <i class="fa-solid fa-cloud-arrow-up"></i> Upload Resume
+                            </button>
+                            <span id="resumeMsg" class="success-msg"></span>
+                        </div>
+                        <div id="currentResumeInfo" style="margin-top: 15px; padding: 12px; border-radius: 8px; background: var(--bg-surface); border: 1px solid var(--border-color);">
+                            <span style="font-size: 0.85rem; color: var(--text-secondary);">Checking resume status...</span>
+                        </div>
                     </form>
                 </section>
 

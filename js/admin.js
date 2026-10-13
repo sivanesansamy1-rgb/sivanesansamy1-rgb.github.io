@@ -469,9 +469,66 @@ function setupProfilePicForm() {
     });
 }
 
+async function loadResumeInfo() {
+    const infoContainer = document.getElementById('currentResumeInfo');
+    if (!infoContainer) return;
+
+    try {
+        let res = await fetch(`${API_URL}/resume/info`);
+        if (!res.ok && typeof FALLBACK_API_URL !== 'undefined') {
+            try {
+                res = await fetch(`${FALLBACK_API_URL}/resume/info`);
+            } catch (e) {}
+        }
+
+        if (res.ok) {
+            const data = await res.json();
+            if (data.exists) {
+                const dateStr = new Date(data.updatedAt).toLocaleDateString(undefined, {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                const sizeKb = data.size ? Math.round(data.size / 1024) + ' KB' : '';
+                infoContainer.innerHTML = `
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <div style="font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
+                                <i class="fa-solid fa-file-pdf" style="color: #ef4444; font-size: 1.1rem;"></i>
+                                <span>${data.filename || 'resume.pdf'}</span>
+                                ${sizeKb ? `<span style="font-size: 0.8rem; font-weight: 400; color: var(--text-secondary);">(${sizeKb})</span>` : ''}
+                            </div>
+                            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 3px;">
+                                <i class="fa-regular fa-clock"></i> Uploaded: ${dateStr}
+                            </div>
+                        </div>
+                        <a href="${API_URL}/resume?v=${new Date(data.updatedAt).getTime()}" target="_blank" class="btn btn-outline" style="padding: 6px 14px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px;">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Preview Live
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+        }
+        infoContainer.innerHTML = `
+            <div style="font-size: 0.85rem; color: var(--text-secondary); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                <span><i class="fa-solid fa-circle-info" style="color: var(--accent-color); margin-right: 6px;"></i>Using default bundled resume (<a href="assets/resume.pdf" target="_blank" style="color: var(--accent-color);">assets/resume.pdf</a>). Upload above to override.</span>
+            </div>
+        `;
+    } catch (e) {
+        infoContainer.innerHTML = `
+            <span style="font-size: 0.85rem; color: var(--text-secondary);"><i class="fa-solid fa-circle-info" style="color: var(--accent-color); margin-right: 6px;"></i>Using default bundled resume (<a href="assets/resume.pdf" target="_blank" style="color: var(--accent-color);">assets/resume.pdf</a>). Upload above to override.</span>
+        `;
+    }
+}
+
 function setupResumeForm() {
     const form = document.getElementById('resumeUploadForm');
     if (!form) return;
+
+    loadResumeInfo();
     
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -482,35 +539,48 @@ function setupResumeForm() {
         formData.append('resume', fileInput.files[0]);
 
         const btn = form.querySelector('button[type="submit"]');
-        const originalText = btn.textContent;
-        btn.textContent = 'Uploading...';
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Uploading...';
         btn.disabled = true;
 
         try {
-            const res = await fetch(`${API_URL}/upload/resume`, {
+            let res = await fetch(`${API_URL}/upload/resume`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`
-                    // Do NOT set Content-Type header manually when using FormData
                 },
                 body: formData
             });
 
+            if (!res.ok && typeof FALLBACK_API_URL !== 'undefined') {
+                try {
+                    res = await fetch(`${FALLBACK_API_URL}/upload/resume`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: formData
+                    });
+                } catch (fbErr) {}
+            }
+
             const msg = document.getElementById('resumeMsg');
             if (res.ok) {
-                msg.textContent = 'Resume uploaded successfully!';
-                msg.style.color = 'var(--text-secondary)';
+                msg.textContent = 'Resume uploaded and saved to cloud successfully!';
+                msg.style.color = '#10b981';
                 form.reset();
+                loadResumeInfo();
             } else {
-                msg.textContent = 'Failed to upload resume.';
-                msg.style.color = 'red';
+                const errData = await res.json().catch(() => ({}));
+                msg.textContent = errData.message || 'Failed to upload resume.';
+                msg.style.color = '#ef4444';
             }
-            setTimeout(() => { msg.textContent = ''; }, 3000);
+            setTimeout(() => { msg.textContent = ''; }, 4000);
         } catch(err) {
             console.error(err);
             alert('An error occurred while uploading.');
         } finally {
-            btn.textContent = originalText;
+            btn.innerHTML = originalHtml;
             btn.disabled = false;
         }
     });
