@@ -683,6 +683,40 @@ document.addEventListener('DOMContentLoaded', () => {
                     const aboutEl = document.querySelector('.about-text p');
                     if (aboutEl) aboutEl.textContent = profile.aboutText;
 
+                    // Contact Details & Social Links
+                    if (profile.email) {
+                        document.querySelectorAll('a[href^="mailto:"]').forEach(el => el.href = `mailto:${profile.email}`);
+                        const emailCardText = document.querySelector('.contact-card i.fa-envelope')?.closest('.contact-card')?.querySelector('.contact-card-info p');
+                        if (emailCardText) emailCardText.textContent = profile.email;
+                    }
+
+                    if (profile.location) {
+                        const locCardText = document.querySelector('.contact-card i.fa-location-dot')?.closest('.contact-card')?.querySelector('.contact-card-info p');
+                        if (locCardText) locCardText.textContent = profile.location;
+                    }
+
+                    if (profile.linkedin) {
+                        document.querySelectorAll('a[href*="linkedin.com"]').forEach(el => el.href = profile.linkedin);
+                        const linkedinCardText = document.querySelector('.contact-card i.fa-linkedin')?.closest('.contact-card')?.querySelector('.contact-card-info p');
+                        if (linkedinCardText) {
+                            const handle = profile.linkedin.replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//i, '').replace(/\/$/, '');
+                            linkedinCardText.textContent = handle || profile.linkedin;
+                        }
+                    }
+
+                    if (profile.github) {
+                        document.querySelectorAll('.social-icons a[aria-label="GitHub"]').forEach(el => el.href = profile.github);
+                        const githubCard = document.querySelector('.contact-card i.fa-github')?.closest('.contact-card');
+                        if (githubCard) {
+                            githubCard.href = profile.github;
+                            const githubCardText = githubCard.querySelector('.contact-card-info p');
+                            if (githubCardText) {
+                                const handle = profile.github.replace(/^https?:\/\/(www\.)?github\.com\//i, '').replace(/\/$/, '');
+                                githubCardText.textContent = handle || profile.github;
+                            }
+                        }
+                    }
+
                     if (profile.profileImage) {
                         const profileSrc = `${profile.profileImage}?v=${new Date(profile.updatedAt || Date.now()).getTime()}`;
                         const heroProfileImg = document.querySelector('.profile-img');
