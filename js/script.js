@@ -49,8 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const cursorDot = document.querySelector('.cursor-dot');
     const cursorOutline = document.querySelector('.cursor-outline');
 
-    // Check if it's a touch device
-    const isTouchDevice = (('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0));
+    // Check if it's a touch device or mobile screen
+    const isTouchDevice = (('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0) || window.innerWidth <= 768);
 
     if (!isTouchDevice && cursorDot && cursorOutline) {
         document.body.classList.add('cursor-none');
@@ -64,8 +64,6 @@ document.addEventListener('DOMContentLoaded', () => {
             cursorDot.style.top = `${posY}px`;
 
             // Move outline with a slight delay using requestAnimationFrame for smoothness
-            // We use simple CSS translation or direct left/top positioning
-            // For better performance, transform is preferred but direct left/top works fine for simple implementation
             cursorOutline.animate({
                 left: `${posX}px`,
                 top: `${posY}px`
@@ -86,6 +84,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 cursorOutline.style.backgroundColor = 'transparent';
             });
         });
+    } else if (cursorDot && cursorOutline) {
+        // Ensure hidden on touch or mobile
+        cursorDot.style.display = 'none';
+        cursorOutline.style.display = 'none';
+        document.body.classList.remove('cursor-none');
     }
 
     /* =========================================
@@ -111,26 +114,69 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /* =========================================
-       3. Mobile Navigation
+       3. Mobile Navigation Drawer
     ========================================= */
     const hamburger = document.getElementById('hamburger');
     const navMenu = document.getElementById('nav-menu');
-    const navLinks = document.querySelectorAll('.nav-link');
+    const navOverlay = document.getElementById('nav-overlay');
+    const navMenuClose = document.getElementById('nav-menu-close');
+    const navLinks = document.querySelectorAll('.nav-link, .nav-mobile-resume');
 
-    if (hamburger && navMenu) {
+    function openMobileMenu() {
+        if (!navMenu) return;
+        hamburger?.classList.add('active');
+        navMenu.classList.add('active');
+        navOverlay?.classList.add('active');
+        document.body.classList.add('nav-open');
+    }
+
+    function closeMobileMenu() {
+        if (!navMenu) return;
+        hamburger?.classList.remove('active');
+        navMenu.classList.remove('active');
+        navOverlay?.classList.remove('active');
+        document.body.classList.remove('nav-open');
+    }
+
+    if (hamburger) {
         hamburger.addEventListener('click', () => {
-            hamburger.classList.toggle('active');
-            navMenu.classList.toggle('active');
-        });
-
-        // Close menu when a link is clicked
-        navLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                hamburger.classList.remove('active');
-                navMenu.classList.remove('active');
-            });
+            const isOpen = navMenu?.classList.contains('active');
+            if (isOpen) {
+                closeMobileMenu();
+            } else {
+                openMobileMenu();
+            }
         });
     }
+
+    if (navMenuClose) {
+        navMenuClose.addEventListener('click', closeMobileMenu);
+    }
+
+    if (navOverlay) {
+        navOverlay.addEventListener('click', closeMobileMenu);
+    }
+
+    // Close menu when clicking any nav link
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            closeMobileMenu();
+        });
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && navMenu?.classList.contains('active')) {
+            closeMobileMenu();
+        }
+    });
+
+    // Close on window resize to desktop
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768 && navMenu?.classList.contains('active')) {
+            closeMobileMenu();
+        }
+    });
 
     /* =========================================
        4. Navbar Scroll Effect

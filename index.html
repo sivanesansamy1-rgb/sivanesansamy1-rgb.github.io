@@ -33,7 +33,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=2.0">
 </head>
 
 <body>
@@ -53,12 +53,21 @@
     <div class="bg-gradient-1"></div>
     <div class="bg-gradient-2"></div>
 
+    <!-- Mobile Navigation Overlay -->
+    <div class="nav-overlay" id="nav-overlay"></div>
+
     <!-- Navigation Bar -->
     <header class="navbar" id="navbar">
         <div class="nav-container">
             <a href="#" class="nav-logo">Sivanesan S</a>
 
             <nav class="nav-menu" id="nav-menu">
+                <div class="nav-menu-header">
+                    <span class="nav-menu-logo">Sivanesan S</span>
+                    <button class="nav-menu-close" id="nav-menu-close" aria-label="Close navigation">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
                 <ul class="nav-links">
                     <li><a href="#home" class="nav-link">Home</a></li>
                     <li><a href="#about" class="nav-link">About</a></li>
@@ -67,6 +76,17 @@
                     <li><a href="#experience" class="nav-link">Experience</a></li>
                     <li><a href="#contact" class="nav-link">Contact</a></li>
                 </ul>
+                <div class="nav-menu-footer">
+                    <a href="assets/resume.pdf" target="_blank" class="btn btn-primary nav-mobile-resume">
+                        <i class="fa-solid fa-file-pdf"></i> View Resume
+                    </a>
+                    <div class="nav-mobile-socials">
+                        <a href="https://github.com/sivanesansamy1-rgb" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+                        <a href="https://www.linkedin.com/in/sivanesan--s" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+                        <a href="https://www.instagram.com/sivanesan_2k5?stkn=MTF2ZmVuMGF3d2tmcA==" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="mailto:sivanesansamy1@gmail.com" aria-label="Email"><i class="fa-solid fa-envelope"></i></a>
+                    </div>
+                </div>
             </nav>
 
             <div class="nav-right">
@@ -76,8 +96,7 @@
                 </button>
                 <a href="assets/resume.pdf" target="_blank" class="btn btn-outline resume-btn">Resume</a>
 
-
-                <div class="hamburger" id="hamburger">
+                <div class="hamburger" id="hamburger" aria-label="Open menu" role="button" tabindex="0">
                     <span class="bar"></span>
                     <span class="bar"></span>
                     <span class="bar"></span>
@@ -665,13 +684,14 @@
                                 <p>sivanesansamy1@gmail.com</p>
                             </div>
                         </a>
-                        <div class="contact-card">
+                        <a href="https://www.google.com/maps/place/SIVANESAN+Kilvelur/@10.7639663,79.7244445,17z/data=!3m1!4b1!4m6!3m5!1s0x3a5541000366d2dd:0x1873ddd4ad9ae7e3!8m2!3d10.7639663!4d79.7244445!16s%2Fg%2F11y46fbbjx?entry=ttu&g_ep=EgoyMDI2MTAwNy4wIKXMDSoASAFQAw%3D%3D"
+                            class="contact-card" target="_blank" rel="noopener noreferrer" aria-label="View Location on Google Maps">
                             <i class="fa-solid fa-location-dot contact-icon"></i>
                             <div class="contact-card-info">
                                 <h3>Location</h3>
                                 <p>Nagapattinam, India</p>
                             </div>
-                        </div>
+                        </a>
                         <a href="https://www.linkedin.com/in/sivanesan--s" class="contact-card" target="_blank"
                             rel="noopener noreferrer">
                             <i class="fa-brands fa-linkedin contact-icon"></i>
@@ -794,7 +814,7 @@
     </button>
 
     <!-- Custom JavaScript -->
-    <script src="js/script.js"></script>
+    <script src="js/script.js?v=2.0"></script>
 </body>
 
 </html>
